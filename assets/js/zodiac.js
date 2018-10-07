@@ -3,6 +3,7 @@ $(document).ready( function() {
     Vue.config.debug = true;
 
     var scrollPos = 0;
+    var baseURL = 'http://localhost:3000'
 
     // Global Vuex datastore
     var store = new Vuex.Store({
@@ -51,7 +52,7 @@ $(document).ready( function() {
             // The navbar currently lives outside the app, so we're updaing
             // the app so we're updating the old fashioned way.
             fetchNowPlaying: function() {
-                $.get('http://localhost:3000/now-playing', (resp) => {
+                $.get(baseURL + '/now-playing', (resp) => {
                     $('#now-playing').text(resp.Title);
                 })
                 .fail(function() { console.log('Error fetching current song'); });
@@ -73,12 +74,12 @@ $(document).ready( function() {
             // Player controls
             // NOTE: Updating the datastore is handled via messages received
             //       over the websocket.
-            play:  function() { $.post('http://localhost:3000/player/play') },
-            pause: function() { $.post('http://localhost:3000/player/pause') },
-            stop:  function() { $.post('http://localhost:3000/player/stop') },
-            next:  function() { $.post('http://localhost:3000/player/next') },
-            prev:  function() { $.post('http://localhost:3000/player/previous') },
-            clearPlaylist: function() { $.post('http://localhost:3000/playlist/clear') },
+            play:  function() { $.post(baseURL + '/player/play') },
+            pause: function() { $.post(baseURL + '/player/pause') },
+            stop:  function() { $.post(baseURL + '/player/stop') },
+            next:  function() { $.post(baseURL + '/player/next') },
+            prev:  function() { $.post(baseURL + '/player/previous') },
+            clearPlaylist: function() { $.post(baseURL + '/playlist/clear') },
 
             // Playlist controls
 
@@ -87,13 +88,13 @@ $(document).ready( function() {
 
             // Play a song from playlist by playlist position
             playPos: function(pos) {
-                $.post('http://localhost:3000/playlist/play/' + pos);
+                $.post(baseURL + '/playlist/play/' + pos);
             },
 
             // Deletes song from playlist by position
             deletePos: function(pos) {
                 scrollPos = $(window).scrollTop();
-                $.post('http://localhost:3000/playlist/delete/' + pos);
+                $.post(baseURL + '/playlist/delete/' + pos);
             }
         },
     };
@@ -109,7 +110,7 @@ $(document).ready( function() {
         methods: {
             fetchArtists: function(listby) {
                 // Use EC2015 arrow notation to get at the component's `this`.
-                $.get('http://localhost:3000/list/' + listby, (resp) => {
+                $.get(baseURL + '/list/' + listby, (resp) => {
                     this.artists = resp.List;
                 })
                 .fail(function() { console.log('Error fetching artist list'); });
@@ -128,7 +129,7 @@ $(document).ready( function() {
         methods: {
             fetchGenres: function(listby) {
                 // Use EC2015 arrow notation to get at the component's `this`.
-                $.get('http://localhost:3000/list/genre', (resp) => {
+                $.get(baseURL + '/list/genre', (resp) => {
                     this.genres = resp.List;
                 })
                 .fail(function() { console.log('Error fetching genre list'); });
@@ -151,20 +152,20 @@ $(document).ready( function() {
 
                 if (artist && artist != "") {
                     artist = encodeURIComponent(artist);
-                    $.get('http://localhost:3000/find/albums?artist=' + artist, (resp) => {
+                    $.get(baseURL + '/find/albums?artist=' + artist, (resp) => {
                         this.albums = resp.Albums;
                     })
                     .fail(function() { console.log('Error fetching album list'); });
                 }
                 else if (genre && genre != "") {
                     genre = encodeURIComponent(genre);
-                    $.get('http://localhost:3000/find/albums?genre=' + genre, (resp) => {
+                    $.get(baseURL + '/find/albums?genre=' + genre, (resp) => {
                         this.albums = resp.Albums;
                     })
                     .fail(function() { console.log('Error fetching album list'); });
                 }
                 else {
-                    $.get('http://localhost:3000/list/album', (resp) => {
+                    $.get(baseURL + '/list/album', (resp) => {
                         var albums = [];
                         resp.List.forEach(
                             function(el) { albums.push({Title: el}); }
@@ -188,7 +189,7 @@ $(document).ready( function() {
         methods: {
             fetchSongs: function() {
                 var album = encodeURIComponent(this.$route.query.album);
-                $.get('http://localhost:3000/find/songs?album=' + album, (resp) => {
+                $.get(baseURL + '/find/songs?album=' + album, (resp) => {
                     this.album = resp;
                     if (
                         this.album.Artist === "Various Artists" ||
@@ -208,11 +209,11 @@ $(document).ready( function() {
             },
             play: function(loc) {
                 loc = encodeURIComponent(loc);
-                $.post( 'http://localhost:3000/playlist/clear',
+                $.post(baseURL + '/playlist/clear',
                     function(data) {
-                        $.post( 'http://localhost:3000/playlist/add?loc=' + loc,
+                        $.post(baseURL + '/playlist/add?loc=' + loc,
                             function(data) {
-                                $.post('http://localhost:3000/playlist/play/-1');
+                                $.post(baseURL + '/playlist/play/-1');
                             }
                         );
                     }
@@ -220,7 +221,7 @@ $(document).ready( function() {
             },
             queue: function(loc) {
                 loc = encodeURIComponent(loc);
-                $.post('http://localhost:3000/playlist/add?loc=' + loc);
+                $.post(baseURL + '/playlist/add?loc=' + loc);
             },
         }
     };
