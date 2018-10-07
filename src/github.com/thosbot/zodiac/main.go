@@ -16,6 +16,8 @@ import (
 	"github.com/rs/cors"
 )
 
+const BaseURL = "127.0.0.1:3000"
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -30,7 +32,11 @@ func main() {
 	// XXX: Not sure that CORS is actually working -- we're currently just
 	//      overriding via CheckOrigin.
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost", "http://localhost:3000", "http://127.0.0.1", "http://127.0.0.1:3000", "http://10.0.0.2", "http://10.0.0.2:3000"},
+		AllowedOrigins: []string{
+			"http://localhost", "http://localhost:3000",
+			"http://127.0.0.1", "http://127.0.0.1:3000",
+			"http://10.0.0.2", "http://10.0.0.2:3000",
+		},
 		AllowedMethods:   []string{http.MethodGet, http.MethodPost},
 		AllowCredentials: true,
 	})
@@ -52,7 +58,7 @@ func main() {
 	r.HandleFunc("/playlist/delete/{pos}", deletePos).Methods(http.MethodPost)
 
 	srv := &http.Server{
-		Addr:         "127.0.0.1:3000",
+		Addr:         BaseURL,
 		WriteTimeout: time.Second * 15, // Set timeouts to avoid Slowloris attacks
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
