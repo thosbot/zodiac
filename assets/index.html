@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- meta -->
+        <meta http-equiv="Content-Type" content="text/html; charset=[% settings.charset %]">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <meta name="description" content="">
+        <meta name="author" content="Thosbot">
+        <meta name="keywords" content="">
+        <!-- /meta -->
+
+        <title>Jukebox</title>
+
+        <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
+        <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+        <link rel="stylesheet" href="css/juke.css">
+    </head>
+
+    <body>
+        <div id="juke-app">
+            <nav id="navbar" class="navbar navbar-default navbar-fixed-top">
+                <div class="container">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        <li>
+                            <a href="#/browse/albums">Albums</a>
+                        </li>
+                        <li>
+                            <a href="#/browse/artists">Artists</a>
+                        </li>
+                        <li>
+                            <a href="#/browse/genres">Genres</a>
+                        </li>
+                    </ul>
+                    <p class="navbar-text navbar-right">
+                        Now playing: <span id="now-playing"></span>
+                    </p>
+                </div>
+            </nav>
+
+            <router-view></router-view>
+        </div>
+
+        <template id="home-template">
+            <div id="home" class="container">
+                <div id="player" class="col-sm-12 col-md-7 col-md-offset-1">
+                    <h1>Now Playing</h1>
+
+                    <div v-show="currentsong.Title" class="media">
+                        <div class="media-left col-sm-3">
+                            <img v-if="currentsong.file"
+                                v-bind:src="albumCoverFilepath(currentsong.file)"
+                                v-bind:alt="currentsong.Album"
+                                style="width: 100%"
+                            >
+                        </div>
+
+                        <div class="media-body" data-ws-url="[% ws_url %]">
+                            <div class="caption">
+                                <span class="lead">{{currentsong.Title}}</span><br>
+                                <strong>{{currentsong.Artist}}</strong>.
+                                <em>{{currentsong.Album}}</em>, {{currentsong.Date}}.
+                            </div>
+
+                            <div id="player-controls" v-bind:class="status.state" class="btn-group-lg" style="margin: 1em 0">
+                                <button id="mpd-prev" v-on:click="prev" class="btn btn-default">
+                                    <i class="fa fa-step-backward"></i>
+                                </button>
+
+                                <button id="mpd-play" v-on:click="play" class="btn btn-default">
+                                    <i id="mpd-play-icon" class="fa fa-play"></i>
+                                </button>
+
+                                <button id="mpd-pause" v-on:click="pause" class="btn btn-default">
+                                    <i id="mpd-pause-icon" class="fa fa-pause"></i>
+                                </button>
+
+                                <button id="mpd-stop" v-on:click="stop" class="btn btn-default">
+                                    <i id="mpd-stop-icon" class="fa fa-stop"></i>
+                                </button>
+
+                                <button id="mpd-next" v-on:click="next" class="btn btn-default">
+                                    <i class="fa fa-step-forward"></i>
+                                </button>
+                            </div><!-- /player-controls -->
+                        </div><!-- /media-body -->
+                    </div><!-- /media -->
+                </div><!-- /now-playing -->
+
+                <div id="curr-queue" class="col-sm-12 col-md-7 col-md-offset-1">
+                    <h1>Queue</h1>
+                    <p><small>[ <a href="#" v-on:click="clearPlaylist">Clear</a> ]</small></p>
+
+                    <div v-for="song in queue"
+                        v-bind:id="plSongDivID(song.Id)"
+                        class="media browser-item"
+                        v-bind:class="{ 'active-song': song.Id == currentsong.Id, 'playlist-item': song.Id != currentsong.Id }"
+                        style="padding: 0.5em 0.5em 0.5em 0;"
+                    >
+                        <p class="pull-right">
+                            <small>[ <a href="#" v-on:click="deletePos(song.Pos)">Remove</a> ]</small>
+                        </p>
+                        <div v-on:click="playPos(song.Pos)">
+                            <div class="media-left col-sm-2">
+                                <img v-if="song.file"
+                                    v-bind:src="albumCoverFilepath(song.file)"
+                                    v-bind:alt="song.album"
+                                    style="width: 100%;"
+                                >
+                            </div>
+                            <div class="media-body">
+                                <span class="lead">{{song.Title}}</span><br>
+                                <em>{{song.Album}}</em><br>
+                                <strong>{{song.Artist}}</strong><br>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /curr-queue -->
+            </div>
+        </template>
+
+        <template id="artist-browser-template">
+            <div id="artist-browser" class="container">
+                <div class="col-sm-12 col-md-7 col-md-offset-1">
+                    <h1>Artists</h1>
+                    <p><small>[
+                        <a href="#" v-on:click="fetchArtists('artist')">All artists</a> |
+                        <a href="#" v-on:click="fetchArtists('albumartist')">Album artists</a>
+                    ]</small></p>
+
+                    <div v-for="artist in artists"
+                        class="panel panel-default browser-item"
+                        style="margin: 0.5em 0;"
+                    >
+                        <div class="panel-body">
+                            <router-link :to="{ path: 'albums', query: { artist: artist } }">{{artist}}</router-link>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /artist-browser -->
+        </template><!-- /artist-browser-template -->
+
+        <template id="album-browser-template">
+            <div id="album-browser" class="container">
+                <div class="col-sm-12 col-md-7 col-md-offset-1">
+                    <h1>Albums</h1>
+
+                    <div v-for="album in albums"
+                        class="panel panel-default browser-item"
+                        style="margin: 0.5em 0;"
+                    >
+                        <div class="panel-body">
+                            <!-- TODO: Add artist to query -->
+                            <router-link :to="{ path: 'songs', query: { album: album.Title } }">
+                                {{album.Title}}
+                                <span v-if="album.Date">({{album.Date}})</span>
+                            </router-link>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /album-browser -->
+        </template><!-- /album-browser-template -->
+
+        <template id="song-browser-template">
+            <div id="song-browser" class="container">
+                <div class="col-sm-12 col-md-9 col-md-offset-1">
+                    <div v-if="album.Title" class="media panel panel-default album" style="padding: 0.5em 0; margin: 0.5em 0">
+                        <div class="media-left album-cover col-sm-3">
+                            <img v-if="album.Songs[0].file"
+                                v-bind:src="albumCoverFilepath(album.Songs[0].file)"
+                                v-bind:alt="album.Title"
+                                style="width: 100%;"
+                            >
+                        </div>
+                        <div class="media-body">
+                            <div>
+                                <span class="lead">{{album.Title}}</span><br>
+                                <strong>{{album.Artist}}</strong><br>
+                                <div id="album-controls" class="btn-group-sm" style="margin: 1em 0">
+                                    <button v-on:click="play(album.Dir)" class="btn btn-default">
+                                        <i class="fa fa-play"></i>
+                                    </button>
+                                    <button v-on:click="queue(album.Dir)" class="btn btn-default">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <ul class="song-list">
+                                <li v-for="song in album.Songs" class="browser-item">
+                                    <div v-on:click="toggleOptsDiv(song.file)">
+                                        {{song.Track}}. {{song.Title}}
+                                        <span v-if="album.Various">- {{song.Artist}}</span>
+                                        <span class="pull-right">{{seconds2Time(song.duration)}}</span>
+                                    </div>
+                                    <div v-show="optsToggle === song.file" class="btn-group-sm" style="margin: 1em 1em">
+                                        <button v-on:click="play(song.file)" class="btn btn-default">
+                                            <i class="fa fa-play"></i>
+                                        </button>
+                                        <button v-on:click="queue(song.file)" class="btn btn-default">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /song-browser -->
+        </template><!-- /song-browser-tempate -->
+
+        <template id="genre-browser-template">
+            <div id="genre-browser" class="container">
+                <div class="col-sm-12 col-md-7 col-md-offset-1">
+                    <h1>Genres</h1>
+
+                    <div v-for="genre in genres"
+                        class="panel panel-default browser-item"
+                        style="margin: 0.5em 0;"
+                    >
+                        <div class="panel-body">
+                            <router-link :to="{ path: 'albums', query: { genre: genre } }">{{genre}}</router-link>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /genre-browser -->
+        </template><!-- /genre-browser-template -->
+
+        <script src="vendor/js/jquery.min.js"></script>
+        <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+        <script src="vendor/js/vue.js"></script>
+        <script src="vendor/js/vuex.js"></script>
+        <script src="vendor/js/vue-router.js"></script>
+        <script src="js/zodiac.js"></script>
+    </body>
+</html>

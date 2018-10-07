@@ -1,0 +1,61 @@
+body {
+    padding-top: 70px;
+    font-family: 'Raleway', sans-serif;
+}
+
+/* Player controls */
+.play #mpd-play-icon {
+    color: blue;
+}
+.play #mpd-pause-icon, .play #mpd-stop-icon {
+    color: black;
+}
+.pause #mpd-pause-icon {
+    color: blue;
+}
+.pause #mpd-play-icon, .pause #mpd-stop-icon {
+    color: black;
+}
+.stop #mpd-stop-icon {
+    color: blue;
+}
+.stop #mpd-play-icon, .play #mpd-pause-icon {
+    color: black;
+}
+.btn:focus {
+    /* outline: none; */
+    background-color: #fff;
+    border-color: #ccc
+}
+
+/* Queue */
+.playlist-item {
+    border: 1px solid transparent;
+}
+.active-song {
+    border: 1px solid blue;
+}
+
+/* Album */
+.album {
+    border: none;
+}
+.album-cover {
+    padding: 5px 20px 0px 5px;
+}
+
+.song-list {
+    padding: 0 1em 0 0;
+}
+.song-list li {
+    list-style: none;
+    padding: .3em 0;
+}
+
+.browser-item {
+    cursor: pointer;
+}
+
+.clearfix {
+  overflow: auto;
+}
