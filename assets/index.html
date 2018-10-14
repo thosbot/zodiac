@@ -55,6 +55,7 @@
                             <img v-if="currentsong.file"
                                 v-bind:src="albumCoverFilepath(currentsong.file)"
                                 v-bind:alt="currentsong.Album"
+                                @error="loadAltAlbumCover"
                                 style="width: 100%"
                             >
                         </div>
@@ -109,6 +110,7 @@
                                 <img v-if="song.file"
                                     v-bind:src="albumCoverFilepath(song.file)"
                                     v-bind:alt="song.album"
+                                    @error="loadAltAlbumCover"
                                     style="width: 100%;"
                                 >
                             </div>
@@ -173,6 +175,7 @@
                             <img v-if="album.Songs[0].file"
                                 v-bind:src="albumCoverFilepath(album.Songs[0].file)"
                                 v-bind:alt="album.Title"
+                                @error="loadAltAlbumCover"
                                 style="width: 100%;"
                             >
                         </div>

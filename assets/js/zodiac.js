@@ -57,7 +57,13 @@ $(document).ready( function() {
                     $('#now-playing').text(resp.Title);
                 })
                 .fail(function() { console.log('Error fetching current song'); });
-            }
+            },
+
+            loadAltAlbumCover: function(evt) {
+                event.target.parentNode.style.display = 'none';
+                // Add 0.5em padding to the album cover
+                // TODO: event.target.src = "working-image.jpg" // imgUrl
+            },
         }
     }
 
