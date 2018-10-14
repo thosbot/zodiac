@@ -3,7 +3,8 @@ $(document).ready( function() {
     Vue.config.debug = true;
 
     var scrollPos = 0;
-    var baseURL = 'http://localhost:3000'
+    var baseURL = 'http://localhost:3000';
+    var wsURL = 'ws://localhost:3000/ws';
 
     // Global Vuex datastore
     var store = new Vuex.Store({
@@ -241,7 +242,7 @@ $(document).ready( function() {
     // WebSocket connection
     openWebSocket();
     function openWebSocket() {
-        var ws = new WebSocket('ws://localhost:3000/ws');
+        var ws = new WebSocket(wsURL);
         ws.onopen = function(evt) { onOpen(evt); };
         ws.onmessage = function(evt) { onMessage(evt); };
         ws.onclose = function(){
