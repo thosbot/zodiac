@@ -233,7 +233,7 @@ $(document).ready( function() {
         }
     };
 
-    var router = new VueRouter( {
+    var router = new VueRouter({
         mode: 'hash',
         base: window.location.href,
         routes: [
@@ -243,7 +243,7 @@ $(document).ready( function() {
             { path: '/browse/songs', name: 'songs', component: SongBrowser },
             { path: '/browse/genres', name: 'genres', component: GenreBrowser },
         ],
-    } );
+    });
 
     // Close the navbar on link clink
     $(document).on('click', '.navbar-collapse.in',function(e) {
