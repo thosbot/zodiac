@@ -198,7 +198,7 @@
                                     <div v-on:click="toggleOptsDiv(song.file)">
                                         {{song.Track}}. {{song.Title}}
                                         <span v-if="album.Various">- {{song.Artist}}</span>
-                                        <span class="pull-right">{{seconds2Time(song.duration)}}</span>
+                                        <span class="pull-right">{{seconds2Time(song.Time)}}</span>
                                     </div>
                                     <div v-show="optsToggle === song.file" class="btn-group-sm" style="margin: 1em 1em">
                                         <button v-on:click="play(song.file)" class="btn btn-default">
