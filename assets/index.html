@@ -139,19 +139,18 @@
 
         <template id="artist-browser-template">
             <div id="artist-browser" class="container">
-                <div class="col-sm-12 col-md-7 col-md-offset-1">
+                <div>
                     <h1>Artists</h1>
-                    <p><small>[
+                    <p style="margin-bottom:1.6em"><small>[
                         <a href="#" v-on:click="fetchArtists('artist')">All artists</a> |
                         <a href="#" v-on:click="fetchArtists('albumartist')">Album artists</a>
-                    ]</small></p>
+                        ]</small></p>
 
-                    <div v-for="artist in artists"
-                        class="panel panel-default browser-item"
-                        style="margin: 0.5em 0;"
-                    >
-                        <div class="panel-body">
-                            <router-link :to="{ path: 'albums', query: { artist: artist } }">{{artist}}</router-link>
+                    <div v-for="artist in artists" class="col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <router-link :to="{ path: 'albums', query: { artist: artist } }">{{artist}}</router-link>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -160,19 +159,18 @@
 
         <template id="album-browser-template">
             <div id="album-browser" class="container">
-                <div class="col-sm-12 col-md-7 col-md-offset-1">
+                <div>
                     <h1>Albums</h1>
 
-                    <div v-for="album in albums"
-                        class="panel panel-default browser-item"
-                        style="margin: 0.5em 0;"
-                    >
-                        <div class="panel-body">
-                            <!-- TODO: Add artist to query -->
-                            <router-link :to="{ path: 'songs', query: { album: album.Title } }">
-                                {{album.Title}}
-                                <span v-if="album.Date">({{album.Date}})</span>
-                            </router-link>
+                    <div v-for="album in albums" class="col-sm-6 col-md-4">
+                        <div class="panel panel-default" style="height:5em;">
+                            <div class="panel-body">
+                                <!-- TODO: Add artist to query -->
+                                <router-link :to="{ path: 'songs', query: { album: album.Title } }">
+                                    {{album.Title}}
+                                    <span v-if="album.Date">({{album.Date}})</span>
+                                </router-link>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -230,15 +228,14 @@
 
         <template id="genre-browser-template">
             <div id="genre-browser" class="container">
-                <div class="col-sm-12 col-md-7 col-md-offset-1">
+                <div>
                     <h1>Genres</h1>
 
-                    <div v-for="genre in genres"
-                        class="panel panel-default browser-item"
-                        style="margin: 0.5em 0;"
-                    >
-                        <div class="panel-body">
-                            <router-link :to="{ path: 'albums', query: { genre: genre } }">{{genre}}</router-link>
+                    <div v-for="genre in genres" class="col-md-4">
+                        <div class="panel panel-default browser-item">
+                            <div class="panel-body">
+                                <router-link :to="{ path: 'albums', query: { genre: genre } }">{{genre}}</router-link>
+                            </div>
                         </div>
                     </div>
                 </div>
