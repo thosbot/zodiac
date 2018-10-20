@@ -91,7 +91,7 @@ func dashboard(w http.ResponseWriter, r *http.Request) {
 type Status struct {
 	Status      mpd.Attrs
 	CurrentSong mpd.Attrs
-	Queue       []mpd.Attrs
+	Playlist    []mpd.Attrs
 }
 
 func getStatus() (*Status, error) {
@@ -122,7 +122,7 @@ func getStatus() (*Status, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp.Queue = q
+	resp.Playlist = q
 
 	return &resp, nil
 }

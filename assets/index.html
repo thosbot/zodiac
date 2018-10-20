@@ -104,11 +104,11 @@
                     </div><!-- /media -->
                 </div><!-- /now-playing -->
 
-                <div id="curr-queue" class="col-sm-12 col-md-7 col-md-offset-1">
-                    <h1>Queue</h1>
+                <div id="curr-playlist" class="col-sm-12 col-md-7 col-md-offset-1">
+                    <h1>Playlist</h1>
                     <p><small>[ <a href="#" v-on:click="clearPlaylist">Clear</a> ]</small></p>
 
-                    <div v-for="song in queue"
+                    <div v-for="song in playlist"
                         v-bind:id="plSongDivID(song.Id)"
                         class="media browser-item"
                         v-bind:class="{ 'active-song': song.Id == currentsong.Id, 'playlist-item': song.Id != currentsong.Id }"
@@ -133,7 +133,7 @@
                             </div>
                         </div>
                     </div>
-                </div><!-- /curr-queue -->
+                </div><!-- /curr-playlist -->
             </div>
         </template>
 

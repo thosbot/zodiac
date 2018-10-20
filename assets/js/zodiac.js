@@ -11,12 +11,12 @@ $(document).ready( function() {
         state: {
             Status: {},
             CurrentSong: { Title: '', Artist: '' },
-            Queue: [],
+            Playlist: [],
         },
         mutations: {
             setStatus (state, status) { state.Status = status },
             setCurrentSong (state, song) { state.CurrentSong = song; },
-            setQueue (state, queue) { state.Queue = queue },
+            setPlaylist (state, playlist) { state.Playlist = playlist },
         },
     });
 
@@ -73,7 +73,7 @@ $(document).ready( function() {
         template: '#home-template',
         computed: {
             currentsong () { return store.state.CurrentSong; },
-            queue () { return store.state.Queue },
+            playlist () { return store.state.Playlist },
             status () { return store.state.Status; },
         },
         mixins: [ helpers ],
@@ -293,9 +293,9 @@ $(document).ready( function() {
             document.title = 'Juke';
         }
 
-        // Update the current loaded queue / playlist
-        if (resp.Queue) {
-            store.commit( 'setQueue', resp.Queue );
+        // Update the current loaded playlist
+        if (resp.Playlist) {
+            store.commit( 'setPlaylist', resp.Playlist );
         }
 
         $(window).scrollTop(scrollPos);
