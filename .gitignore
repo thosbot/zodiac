@@ -1,4 +1,8 @@
+# Project directories
 assets/img/albumart
 assets/vendor
 bin
 doc
+
+# Vim
+*.swp
