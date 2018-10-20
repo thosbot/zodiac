@@ -87,6 +87,10 @@ $(document).ready( function() {
             next:  function() { $.post(baseURL + '/player/next') },
             prev:  function() { $.post(baseURL + '/player/previous') },
             clearPlaylist: function() { $.post(baseURL + '/playlist/clear') },
+            adjustVolume: function(d) {
+                vol = parseInt(store.state.Status.volume) + d;
+                $.post(baseURL + '/volume/' + vol);
+            },
 
             // Playlist controls
 

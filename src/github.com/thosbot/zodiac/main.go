@@ -57,6 +57,8 @@ func main() {
 	r.HandleFunc("/playlist/play/{pos}", playPos).Methods(http.MethodPost)
 	r.HandleFunc("/playlist/delete/{pos}", deletePos).Methods(http.MethodPost)
 
+	r.HandleFunc("/volume/{vol}", setVol).Methods(http.MethodPost)
+
 	srv := &http.Server{
 		Addr:         BaseURL,
 		WriteTimeout: time.Second * 15, // Set timeouts to avoid Slowloris attacks
@@ -552,6 +554,54 @@ func deletePos(w http.ResponseWriter, r *http.Request) {
 	err = mpdconn.Delete(pos, -1)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd delete"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Write out an OK JSON response
+	resp := make(map[string]string)
+	resp["status"] = "OK"
+	b, err := json.Marshal(resp)
+	if err != nil {
+		log.Println(errors.Wrap(err, "json marshal"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintln(w, string(b))
+}
+
+func setVol(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Connect to MPD server
+	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
+	if err != nil {
+		log.Println(errors.Wrapf(err, "mpd dial"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer mpdconn.Close()
+
+	// Get volume param
+	vars := mux.Vars(r)
+	vol, err := strconv.Atoi(vars["vol"])
+	if err != nil {
+		log.Println(errors.Wrapf(err, "invalid volume: '%s'", vars["vol"]))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// Keep the volume in the allowable range (0-100)
+	if vol < 0 {
+		vol = 0
+	}
+	if vol > 100 {
+		vol = 100
+	}
+
+	// Set volume
+	err = mpdconn.SetVolume(vol)
+	if err != nil {
+		log.Println(errors.Wrapf(err, "mpd volume"))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
