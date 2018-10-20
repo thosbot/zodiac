@@ -268,17 +268,7 @@ func playerAction(w http.ResponseWriter, r *http.Request) {
 		log.Println(errors.Wrapf(err, "mpd %s", action))
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-
-	// Write out an OK JSON response
-	resp := make(map[string]string)
-	resp["status"] = "OK"
-	b, err := json.Marshal(resp)
-	if err != nil {
-		log.Println(errors.Wrap(err, "json marshal"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprintln(w, string(b))
+	returnOK(w)
 }
 
 func list(w http.ResponseWriter, r *http.Request) {
@@ -449,17 +439,7 @@ func addLoc(w http.ResponseWriter, r *http.Request) {
 		log.Println(errors.Wrapf(err, "mpd add %s", loc))
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-
-	// Write out an OK JSON response
-	resp := make(map[string]string)
-	resp["status"] = "OK"
-	b, err := json.Marshal(resp)
-	if err != nil {
-		log.Println(errors.Wrap(err, "json marshal"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprintln(w, string(b))
+	returnOK(w)
 }
 
 func clearPlaylist(w http.ResponseWriter, r *http.Request) {
@@ -479,17 +459,7 @@ func clearPlaylist(w http.ResponseWriter, r *http.Request) {
 		log.Println(errors.Wrapf(err, "mpd playlist clear"))
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-
-	// Write out an OK JSON response
-	resp := make(map[string]string)
-	resp["status"] = "OK"
-	b, err := json.Marshal(resp)
-	if err != nil {
-		log.Println(errors.Wrap(err, "json marshal"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprintln(w, string(b))
+	returnOK(w)
 }
 
 func playPos(w http.ResponseWriter, r *http.Request) {
@@ -498,7 +468,7 @@ func playPos(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	pos, err := strconv.Atoi(vars["pos"])
 	if err != nil {
-		log.Println(errors.Wrapf(err, "invalid pos"))
+		log.Println(errors.Wrapf(err, "invalid position '%s'", vars["pos"]))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -518,17 +488,7 @@ func playPos(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	// Write out an OK JSON response
-	resp := make(map[string]string)
-	resp["status"] = "OK"
-	b, err := json.Marshal(resp)
-	if err != nil {
-		log.Println(errors.Wrap(err, "json marshal"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprintln(w, string(b))
+	returnOK(w)
 }
 
 func deletePos(w http.ResponseWriter, r *http.Request) {
@@ -537,7 +497,7 @@ func deletePos(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	pos, err := strconv.Atoi(vars["pos"])
 	if err != nil {
-		log.Println(errors.Wrapf(err, "invalid pos"))
+		log.Println(errors.Wrapf(err, "invalid position '%s'", vars["pos"]))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -557,17 +517,7 @@ func deletePos(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	// Write out an OK JSON response
-	resp := make(map[string]string)
-	resp["status"] = "OK"
-	b, err := json.Marshal(resp)
-	if err != nil {
-		log.Println(errors.Wrap(err, "json marshal"))
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprintln(w, string(b))
+	returnOK(w)
 }
 
 func setVol(w http.ResponseWriter, r *http.Request) {
@@ -605,8 +555,11 @@ func setVol(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	returnOK(w)
+}
 
-	// Write out an OK JSON response
+// returnOK prints a `{status: "OK"}` JSON message to the response writer.
+func returnOK(w http.ResponseWriter) {
 	resp := make(map[string]string)
 	resp["status"] = "OK"
 	b, err := json.Marshal(resp)
