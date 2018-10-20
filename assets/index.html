@@ -67,27 +67,30 @@
                                 <em>{{currentsong.Album}}</em>, {{currentsong.Date}}.
                             </div>
 
-                            <div id="player-controls" v-bind:class="status.state" class="btn-group-lg" style="margin: 1em 0">
-                                <button id="mpd-prev" v-on:click="prev" class="btn btn-default">
-                                    <i class="fa fa-step-backward"></i>
-                                </button>
+                            <div class="btn-toolbar" style="margin-top:1em;">
+                                <div id="player-controls" v-bind:class="status.state" class="btn-group btn-group-lg">
+                                    <button id="mpd-prev" v-on:click="prev" class="btn btn-default">
+                                        <i class="fa fa-step-backward"></i>
+                                    </button>
 
-                                <button id="mpd-play" v-on:click="play" class="btn btn-default">
-                                    <i id="mpd-play-icon" class="fa fa-play"></i>
-                                </button>
+                                    <button id="mpd-play" v-on:click="play" class="btn btn-default">
+                                        <i id="mpd-play-icon" class="fa fa-play"></i>
+                                    </button>
 
-                                <button id="mpd-pause" v-on:click="pause" class="btn btn-default">
-                                    <i id="mpd-pause-icon" class="fa fa-pause"></i>
-                                </button>
+                                    <button id="mpd-pause" v-on:click="pause" class="btn btn-default">
+                                        <i id="mpd-pause-icon" class="fa fa-pause"></i>
+                                    </button>
 
-                                <button id="mpd-stop" v-on:click="stop" class="btn btn-default">
-                                    <i id="mpd-stop-icon" class="fa fa-stop"></i>
-                                </button>
+                                    <button id="mpd-stop" v-on:click="stop" class="btn btn-default">
+                                        <i id="mpd-stop-icon" class="fa fa-stop"></i>
+                                    </button>
 
-                                <button id="mpd-next" v-on:click="next" class="btn btn-default">
-                                    <i class="fa fa-step-forward"></i>
-                                </button>
+                                    <button id="mpd-next" v-on:click="next" class="btn btn-default">
+                                        <i class="fa fa-step-forward"></i>
+                                    </button>
+                                </div>
                             </div><!-- /player-controls -->
+
                         </div><!-- /media-body -->
                     </div><!-- /media -->
                 </div><!-- /now-playing -->
