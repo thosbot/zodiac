@@ -106,6 +106,10 @@
 
                 <div id="curr-playlist" class="col-sm-12 col-md-7 col-md-offset-1">
                     <h1>Playlist</h1>
+                    <p>
+                        <!-- {{status}} -->
+                        <span v-if="playlist[0]">{{playliststats.numSongs}} items, length: {{seconds2Time(playliststats.duration)}}</span>
+                    <p>
                     <p><small>[ <a href="#" v-on:click="clearPlaylist">Clear</a> ]</small></p>
 
                     <div v-for="song in playlist"

@@ -90,6 +90,20 @@ $(document).ready( function() {
             currentsong () { return store.state.CurrentSong; },
             playlist () { return store.state.Playlist },
             status () { return store.state.Status; },
+
+            playliststats () {
+                numSongs = store.state.Status.playlistlength;
+                duration = 0;
+                if (store.state.Playlist) {
+                    store.state.Playlist.forEach(
+                        function(el) { duration += parseInt(el.Time) }
+                    );
+                }
+                return {
+                    numSongs: numSongs,
+                    duration: duration,
+                };
+            },
         },
         mixins: [ helpers ],
         methods: {
