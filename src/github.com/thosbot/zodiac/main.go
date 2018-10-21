@@ -296,7 +296,10 @@ func list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := make(map[string][]string)
-	resp["List"] = list
+	for _, li := range list {
+		rec := strings.Split(li, ": ")
+		resp["List"] = append(resp["List"], rec[1])
+	}
 
 	b, err := json.Marshal(resp)
 	if err != nil {
