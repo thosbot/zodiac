@@ -35,7 +35,7 @@ $(document).ready( function() {
             },
 
             // Convert seconds count to H:MM:SS
-            seconds2Time: function(sec) {
+            seconds2HMS: function(sec) {
                 // Double-tilde is double-bitwise-not, same as Math.floor()
                 var h = ~~( sec / 3600 );
                 var m = ~~(( sec % 3600 ) / 60 );
@@ -47,6 +47,21 @@ $(document).ready( function() {
                     t = h + ':' + ( m < 10 ? '0' : '' );
                 }
                 t += m + ':' + ( s < 10 ? '0' : '' ) + s;
+                return t;
+            },
+
+            seconds2Time: function(sec) {
+                // Double-tilde is double-bitwise-not, same as Math.floor()
+                var h = ~~( sec / 3600 );
+                var m = ~~(( sec % 3600 ) / 60 );
+                var s = ~~sec % 60;
+
+                var t = '';
+                if ( h > 0 ) {
+                    t = h + ' hour' + ( h > 1 ? 's' : '' ) + ', ';
+                }
+                t += m + ' minute' + ( m > 1 ? 's' : '' ) + ', ';
+                t += s + ' second' + ( s > 1 ? 's' : '' );
                 return t;
             },
 
