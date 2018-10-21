@@ -151,9 +151,11 @@
                         ]</small></p>
 
                     <div v-for="artist in artists" class="col-md-4">
-                        <div class="panel panel-default">
+                        <div class="panel panel-default browser-item">
                             <div class="panel-body">
-                                <router-link :to="{ path: 'albums', query: { artist: artist } }">{{artist}}</router-link>
+                                <router-link :to="{ path: 'albums', query: { artist: artist } }" tag="div">
+                                    {{artist}}
+                                </router-link>
                             </div>
                         </div>
                     </div>
