@@ -54,8 +54,12 @@ func main() {
 	r.HandleFunc("/find/albums", findAlbums).Methods(http.MethodGet)
 	r.HandleFunc("/find/songs", findSongs).Methods(http.MethodGet)
 
-	r.HandleFunc("/playlist/add", addLoc).Methods(http.MethodPost)
+	r.HandleFunc("/playlists", listPlaylists).Methods(http.MethodGet)
+	r.HandleFunc("/playlist/load/{name}", loadPlaylist).Methods(http.MethodPost)
+	r.HandleFunc("/playlist/save", savePlaylist).Methods(http.MethodPost)
 	r.HandleFunc("/playlist/clear", clearPlaylist).Methods(http.MethodPost)
+
+	r.HandleFunc("/playlist/add", addLoc).Methods(http.MethodPost)
 	r.HandleFunc("/playlist/play/{pos}", playPos).Methods(http.MethodPost)
 	r.HandleFunc("/playlist/delete/{pos}", deletePos).Methods(http.MethodPost)
 
@@ -334,7 +338,6 @@ func listAlbums(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	// log.Printf("LIST: %+v", list)
 
 	type Resp struct {
 		Albums []Album
@@ -425,7 +428,7 @@ func findAlbums(w http.ResponseWriter, r *http.Request) {
 	found := map[string]bool{}
 	for _, s := range list {
 		// Skip to the next song if we've already caught the album details.
-		if found[s["Album"]] {
+		if found[s["Artist"]+"--"+s["Album"]] {
 			continue
 		}
 		a := Album{
@@ -474,6 +477,11 @@ func findSongs(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd list"))
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if len(list) == 0 {
+		log.Printf("couldn't find album '%s'", album)
 		return
 	}
 
@@ -630,6 +638,100 @@ func setVol(w http.ResponseWriter, r *http.Request) {
 	err = mpdconn.SetVolume(vol)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd volume"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	returnOK(w)
+}
+
+func listPlaylists(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Connect to MPD server
+	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
+	if err != nil {
+		log.Println(errors.Wrapf(err, "mpd dial"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer mpdconn.Close()
+
+	playlists, err := mpdconn.ListPlaylists()
+	if err != nil {
+		log.Println(errors.Wrapf(err, "load playlist"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	type Playlist struct {
+		Name  string
+		Songs []mpd.Attrs
+	}
+	type Resp struct {
+		Playlists []Playlist
+	}
+	resp := Resp{}
+	for _, p := range playlists {
+		attrs, _ := mpdconn.PlaylistContents(p["playlist"])
+		pl := Playlist{
+			Name:  p["playlist"],
+			Songs: attrs,
+		}
+		resp.Playlists = append(resp.Playlists, pl)
+	}
+
+	// Send response
+	b, err := json.Marshal(resp)
+	if err != nil {
+		log.Println(errors.Wrap(err, "json marshal"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintln(w, string(b))
+}
+
+func loadPlaylist(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	vars := mux.Vars(r)
+
+	// Connect to MPD server
+	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
+	if err != nil {
+		log.Println(errors.Wrapf(err, "mpd dial"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer mpdconn.Close()
+
+	// Load playlist
+	err = mpdconn.PlaylistLoad(vars["name"], -1, -1)
+	if err != nil {
+		log.Println(errors.Wrapf(err, "load playlist"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	returnOK(w)
+}
+
+func savePlaylist(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	vars := mux.Vars(r)
+
+	// Connect to MPD server
+	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
+	if err != nil {
+		log.Println(errors.Wrapf(err, "mpd dial"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer mpdconn.Close()
+
+	err = mpdconn.PlaylistSave(vars["name"])
+	if err != nil {
+		log.Println(errors.Wrapf(err, "save playlist"))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

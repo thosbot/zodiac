@@ -262,6 +262,41 @@ $(document).ready( function() {
         }
     };
 
+    var PlaylistBrowser = {
+        name: 'PlaylistBrowser',
+        template: '#playlist-browser-template',
+        data: function() {
+            return { playlists: [] };
+        },
+        created: function() { this.fetchPlaylists(); },
+        mixins: [ helpers ],
+        methods: {
+            fetchPlaylists: function(listby) {
+                // Use EC2015 arrow notation to get at the component's `this`.
+                $.get(baseURL + '/playlists', (resp) => {
+                    this.playlists = resp.Playlists;
+                })
+                .fail(function() { console.log('Error fetching playlists'); });
+            },
+            play: function(name) {
+                name = encodeURIComponent(name);
+                $.post(baseURL + '/playlist/clear',
+                    function(data) {
+                        $.post(baseURL + '/playlist/load/' + name,
+                            function(data) {
+                                $.post(baseURL + '/playlist/play/-1');
+                            }
+                        );
+                    }
+                );
+            },
+            queue: function(name) {
+                loc = encodeURIComponent(loc);
+                $.post(baseURL + '/playlist/load/' + name);
+            },
+        },
+    };
+
     var router = new VueRouter({
         mode: 'hash',
         base: window.location.href,
@@ -271,6 +306,7 @@ $(document).ready( function() {
             { path: '/browse/artists', name: 'artists', component: ArtistBrowser },
             { path: '/browse/songs', name: 'songs', component: SongBrowser },
             { path: '/browse/genres', name: 'genres', component: GenreBrowser },
+            { path: '/browse/playlists', name: 'playlists', component: PlaylistBrowser },
         ],
     });
 

@@ -34,6 +34,7 @@
                             <li><a href="#/browse/albums">Albums</a></li>
                             <li><a href="#/browse/artists">Artists</a></li>
                             <li><a href="#/browse/genres">Genres</a></li>
+                            <li><a href="#/browse/playlists">Playlists</a></li>
                         </ul>
                         <p class="navbar-text navbar-right">
                             Now playing: <span id="now-playing"></span>
@@ -248,6 +249,43 @@
                 </div>
             </div><!-- /genre-browser -->
         </template><!-- /genre-browser-template -->
+
+        <template id="playlist-browser-template">
+            <div id="playlist-browser" class="container">
+                <div>
+                    <h1>Playlists</h1>
+
+                    <div v-for="playlist in playlists" class="col-md-6">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+
+                                <div>
+                                    <span class="lead">{{playlist.Name}}</span>
+                                    <div id="album-controls" class="btn-group-sm" style="margin: 1em 0">
+                                        <button v-on:click="play(playlist.Name)" class="btn btn-default">
+                                            <i class="fa fa-play"></i>
+                                        </button>
+                                        <button v-on:click="queue(playlist.Name)" class="btn btn-default">
+                                            <i class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <ol class="song-list">
+                                    <li v-for="song in playlist.Songs" class="browser-item">
+                                        <div>
+                                            {{song.Title}} - {{song.Artist}}
+                                            <span class="pull-right">{{seconds2HMS(song.Time)}}</span>
+                                        </div>
+                                    </li>
+                                </ol>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /playlist-browser -->
+        </template><!-- /playlist-browser-template -->
 
         <script src="vendor/js/jquery.min.js"></script>
         <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
