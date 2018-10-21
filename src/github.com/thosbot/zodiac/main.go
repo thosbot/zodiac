@@ -338,24 +338,44 @@ func listAlbums(w http.ResponseWriter, r *http.Request) {
 	}
 	resp := Resp{}
 
-	// Results come back in a single slice, take elements off in multiples of
-	// three to build the response.
+	// Iterate over the slice of "key: values" returned. Each album will begin
+	// with the "Album" key.
+	album := Album{}
 	for {
+		// We're popping off the slice until it's empty
 		if len(list) == 0 {
 			break
 		}
 
-		a := Album{
-			Title:  list[0],
-			Artist: list[1],
-			Date:   list[2],
-		}
-		resp.Albums = append(resp.Albums, a)
+		// Get the next item and "pop" it off the slice
+		rec := strings.Split(list[0], ": ")
+		key, val := rec[0], rec[1]
+		list = list[1:]
 
-		// Now shift the elements off the slice
-		list = list[3:]
+		// We'll know to start a new album object when we receive but have
+		// already captured the album title.
+		if key == "Album" && album.Title != "" {
+			resp.Albums = append(resp.Albums, album)
+			// Clear out the struct
+			album = Album{}
+			continue
+		}
+
+		// Write the value to its correct struct position
+		if key == "Album" {
+			album.Title = val
+		} else if key == "AlbumArtist" {
+			album.Artist = val
+		} else if key == "Date" {
+			album.Date = val
+		} else {
+			log.Println(fmt.Errorf("list albums: unhandled key (%s)", key))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
 
+	// Return results
 	b, err := json.Marshal(resp)
 	if err != nil {
 		log.Println(errors.Wrap(err, "json marshal"))
