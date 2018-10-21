@@ -167,12 +167,13 @@
                     <h1>Albums</h1>
 
                     <div v-for="album in albums" class="col-sm-6 col-md-4">
-                        <div class="panel panel-default" style="height:5em;">
+                        <div class="panel panel-default browser-item" style="height:7em;">
                             <div class="panel-body">
                                 <!-- TODO: Add artist to query -->
-                                <router-link :to="{ path: 'songs', query: { album: album.Title } }">
-                                    {{album.Title}}
-                                    <span v-if="album.Date">({{album.Date}})</span>
+                                <router-link :to="{ path: 'songs', query: { album: album.Title } }" tag="div">
+                                    <div class="album-title-trunc">{{album.Title}}</div>
+                                    {{album.Artist}}<br>
+                                    <span v-if="album.Date">{{album.Date}}</span>
                                 </router-link>
                             </div>
                         </div>

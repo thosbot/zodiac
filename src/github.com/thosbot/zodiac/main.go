@@ -48,7 +48,9 @@ func main() {
 
 	r.HandleFunc("/player/{action}", playerAction).Methods(http.MethodPost)
 
+	r.HandleFunc("/list/albums", listAlbums).Methods(http.MethodGet)
 	r.HandleFunc("/list/{type}", list).Methods(http.MethodGet)
+
 	r.HandleFunc("/find/albums", findAlbums).Methods(http.MethodGet)
 	r.HandleFunc("/find/songs", findSongs).Methods(http.MethodGet)
 
@@ -305,6 +307,64 @@ func list(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(b))
 }
 
+type Album struct {
+	Title  string
+	Artist string
+	Date   string
+}
+
+func listAlbums(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Connect to MPD server
+	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
+	if err != nil {
+		log.Println(errors.Wrapf(err, "mpd dial"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer mpdconn.Close()
+
+	list, err := mpdconn.List("album", "group", "albumartist", "group", "date")
+	if err != nil {
+		log.Println(errors.Wrapf(err, "mpd list"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// log.Printf("LIST: %+v", list)
+
+	type Resp struct {
+		Albums []Album
+	}
+	resp := Resp{}
+
+	// Results come back in a single slice, take elements off in multiples of
+	// three to build the response.
+	for {
+		if len(list) == 0 {
+			break
+		}
+
+		a := Album{
+			Title:  list[0],
+			Artist: list[1],
+			Date:   list[2],
+		}
+		resp.Albums = append(resp.Albums, a)
+
+		// Now shift the elements off the slice
+		list = list[3:]
+	}
+
+	b, err := json.Marshal(resp)
+	if err != nil {
+		log.Println(errors.Wrap(err, "json marshal"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintln(w, string(b))
+}
+
 func findAlbums(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -326,11 +386,6 @@ func findAlbums(w http.ResponseWriter, r *http.Request) {
 	}
 	defer mpdconn.Close()
 
-	type Album struct {
-		Title  string
-		Artist string
-		Date   string
-	}
 	type Resp struct {
 		Albums []Album
 	}
@@ -356,7 +411,7 @@ func findAlbums(w http.ResponseWriter, r *http.Request) {
 			Date:   s["Date"],
 		}
 		resp.Albums = append(resp.Albums, a)
-		found[s["Album"]] = true
+		found[s["Artist"]+"--"+s["Album"]] = true
 	}
 
 	// Send response

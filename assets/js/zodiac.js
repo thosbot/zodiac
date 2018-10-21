@@ -205,12 +205,8 @@ $(document).ready( function() {
                     .fail(function() { console.log('Error fetching album list'); });
                 }
                 else {
-                    $.get(baseURL + '/list/album', (resp) => {
-                        var albums = [];
-                        resp.List.forEach(
-                            function(el) { albums.push({Title: el}); }
-                        )
-                        this.albums = albums;
+                    $.get(baseURL + '/list/albums', (resp) => {
+                        this.albums = resp.Albums;
                     })
                     .fail(function() { console.log('Error fetching album list'); });
                 }
