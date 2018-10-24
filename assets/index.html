@@ -213,7 +213,7 @@
 
         <template id="song-browser-template">
             <div id="song-browser" class="container">
-                <div class="col-sm-12 col-md-9 col-md-offset-1">
+                <div class="col-sm-12 col-md-10 col-md-offset-1">
                     <div v-if="album.Title" class="media panel panel-default album" style="padding: 0.5em 0; margin: 0.5em 0">
                         <div class="media-left album-cover col-sm-3">
                             <img v-if="album.Songs[0].file"
@@ -268,7 +268,12 @@
                     <div v-for="genre in genres" class="col-md-4">
                         <div class="panel panel-default browser-item">
                             <div class="panel-body">
-                                <router-link :to="{ path: 'albums', query: { genre: genre } }">{{genre}}</router-link>
+                                <router-link
+                                    :to="{ path: 'albums', query: { genre: genre } }"
+                                    tag="div"
+                                >
+                                    {{genre}}
+                                </router-link>
                             </div>
                         </div>
                     </div>
