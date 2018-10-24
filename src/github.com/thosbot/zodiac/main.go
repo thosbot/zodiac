@@ -225,7 +225,8 @@ func writeStatusToWs(wsconn *websocket.Conn) error {
 		return err
 	}
 
-	if err = wsconn.WriteMessage(1, b); err != nil {
+	err = wsconn.WriteMessage(1, b)
+	if err != nil {
 		return err
 	}
 
