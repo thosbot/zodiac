@@ -77,6 +77,12 @@ $(document).ready( function() {
             loadAltAlbumCover: function(evt) {
                 // event.target.src = "/img/albumart/album.jpg"
             },
+
+            getYear: function(date) {
+                if ( date != null && date != "" ) {
+                    return date.substr(0, 4);
+                }
+            },
         }
     }
 

@@ -65,7 +65,7 @@
                             <div class="caption">
                                 <span class="lead">{{currentsong.Title}}</span><br>
                                 <strong>{{currentsong.Artist}}</strong>.
-                                <em>{{currentsong.Album}}</em>, {{currentsong.Date.substr(0,4)}}.
+                                <em>{{currentsong.Album}}</em>, {{getYear(currentsong.Date)}}.
                             </div>
 
                             <div class="btn-toolbar" style="margin-top:1em;">
@@ -202,7 +202,7 @@
                                 <router-link :to="{ path: 'songs', query: { album: album.Title } }" tag="div">
                                     <div class="album-title-trunc">{{album.Title}}</div>
                                     {{album.Artist}}<br>
-                                    <span v-if="album.Date">{{album.Date.substr(0,4)}}</span>
+                                    <span v-if="album.Date">{{getYear(album.Date)}}</span>
                                 </router-link>
                             </div>
                         </div>
