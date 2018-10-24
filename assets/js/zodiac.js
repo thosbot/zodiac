@@ -75,9 +75,7 @@ $(document).ready( function() {
             },
 
             loadAltAlbumCover: function(evt) {
-                event.target.parentNode.style.display = 'none';
-                // Add 0.5em padding to the album cover
-                // TODO: event.target.src = "working-image.jpg" // imgUrl
+                // event.target.src = "/img/albumart/album.jpg"
             },
         }
     }
