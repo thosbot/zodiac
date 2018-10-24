@@ -86,6 +86,13 @@ $(document).ready( function() {
     var Home = {
         name: 'Home',
         template: '#home-template',
+        data: function() {
+            return {
+                showPlaylistOpts: false,
+                savePlaylistResp: '',
+                savePlaylistStatus: '',
+            };
+        },
         computed: {
             currentsong () { return store.state.CurrentSong; },
             playlist () { return store.state.Playlist },
@@ -135,7 +142,32 @@ $(document).ready( function() {
             deletePos: function(pos) {
                 scrollPos = $(window).scrollTop();
                 $.post(baseURL + '/playlist/delete/' + pos);
-            }
+            },
+
+            togglePlaylistOptsDiv: function() {
+                this.showPlaylistOpts = !this.showPlaylistOpts;
+            },
+
+            saveCurrPlaylist: function(evt) {
+                evt.preventDefault();
+                var plName = document.getElementById('save-playlist-name').value;
+
+                $.ajax({
+                    url: baseURL + '/playlist/save',
+                    type: 'POST',
+                    data: JSON.stringify({ Name: plName }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function(resp) {
+                        // TODO: Just pass the response over
+                        // this.resp = resp;
+
+                        this.savePlaylistStatus = 'OK';
+                        this.savePlaylistResp = 'Done!';
+                        // TODO: Add checkmark
+                    }.bind(this),
+                });
+            },
         },
     };
 

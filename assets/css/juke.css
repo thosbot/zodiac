@@ -65,3 +65,13 @@ body {
 .clearfix {
   overflow: auto;
 }
+
+/* Don't let Bootstrap change the background color of a button when focused */
+.btn-primary:focus {
+    background-color: #286090;
+}
+
+.success {
+    color: #3c763d;
+    font-weight: bold;
+}

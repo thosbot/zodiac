@@ -107,11 +107,37 @@
 
                 <div id="curr-playlist" class="col-sm-12 col-md-7 col-md-offset-1">
                     <h1>Playlist</h1>
-                    <p>
-                        <!-- {{status}} -->
-                        <span v-if="playlist[0]">{{playliststats.numSongs}} items, length: {{seconds2Time(playliststats.duration)}}</span>
-                    <p>
-                    <p><small>[ <a href="#" v-on:click="clearPlaylist">Clear</a> ]</small></p>
+                    <div style="padding: 0.5em;">
+                        <div>
+                            <span v-if="playlist[0] && showPlaylistOpts === true" class="pull-right">
+                                <small>[ <a href="#" v-on:click="clearPlaylist">Clear playlist</a> ]</small>
+                            </span>
+
+                            <div v-on:click="togglePlaylistOptsDiv()" class="browser-item">
+                                <i v-bind:class="{ 'fa fa-caret-right': showPlaylistOpts === false, 'fa fa-caret-down': showPlaylistOpts === true }"></i>
+                                {{playliststats.numSongs}} items
+                                <span v-if="playlist[0]">
+                                    , length: {{seconds2Time(playliststats.duration)}}
+                                </span>
+                            </div>
+                        </div>
+                        <div v-if="playlist[0] && showPlaylistOpts === true" style="margin:1em;">
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <label for="save-playlist-name">Save playlist as:</label>
+                                    <input type="text" class="form-control" id="save-playlist-name" placeholder="Super cool tunes">
+                                </div>
+                                <button v-on:click="saveCurrPlaylist" class="btn btn-primary" type="submit">
+                                    <i class="fa fa-save"></i>
+                                </button>
+                                <span
+                                    v-bind:class="{ 'success': savePlaylistStatus === 'OK', }"
+                                >
+                                    {{savePlaylistResp}}
+                                </span>
+                            </form>
+                        </div>
+                    </div>
 
                     <div v-for="song in playlist"
                         v-bind:id="plSongDivID(song.Id)"

@@ -718,7 +718,17 @@ func loadPlaylist(w http.ResponseWriter, r *http.Request) {
 func savePlaylist(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	vars := mux.Vars(r)
+	type Playlist struct {
+		Name string
+	}
+	pl := Playlist{}
+
+	err := json.NewDecoder(r.Body).Decode(&pl)
+	if err != nil {
+		log.Println(errors.Wrapf(err, "save playlist"))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
@@ -729,7 +739,7 @@ func savePlaylist(w http.ResponseWriter, r *http.Request) {
 	}
 	defer mpdconn.Close()
 
-	err = mpdconn.PlaylistSave(vars["name"])
+	err = mpdconn.PlaylistSave(pl.Name)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "save playlist"))
 		w.WriteHeader(http.StatusInternalServerError)
