@@ -132,10 +132,11 @@
                                 <button v-on:click="saveCurrentPlaylist" class="btn btn-primary" type="submit">
                                     <i class="fa fa-save"></i>
                                 </button>
-                                <span
-                                    v-bind:class="{ 'success': savePlaylistStatus === 'OK', }"
-                                >
-                                    {{savePlaylistResp}}
+
+                                <!-- Response -->
+                                <span v-bind:class="{ 'msg msg-success': resp.status === 'OK', 'msg msg-danger': resp.status === 'ERR' }">
+                                    <i v-bind:class="{ 'fa fa-check': resp.status === 'OK', 'fa fa-exclamation': resp.status === 'ERR' }"></i>
+                                    {{resp.msg}}
                                 </span>
                             </form>
                         </div>
@@ -237,6 +238,12 @@
                                     <button v-on:click="queue(album.Dir)" class="btn btn-default">
                                         <i class="fa fa-plus"></i>
                                     </button>
+
+                                    <!-- Response -->
+                                    <span v-bind:class="{ 'msg msg-success': resp.status === 'OK', 'msg msg-danger': resp.status === 'ERR' }">
+                                        <i v-bind:class="{ 'fa fa-check': resp.status === 'OK', 'fa fa-exclamation': resp.status === 'ERR' }"></i>
+                                        {{resp.msg}}
+                                    </span>
                                 </div>
                             </div>
 

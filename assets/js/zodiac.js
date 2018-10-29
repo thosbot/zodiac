@@ -93,8 +93,7 @@ $(document).ready(function() {
         data: function() {
             return {
                 showPlaylistOpts: false,
-                savePlaylistResp: '',
-                savePlaylistStatus: '',
+                resp: { status: '', msg: '' },
             };
         },
         computed: {
@@ -166,12 +165,8 @@ $(document).ready(function() {
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     success: function(resp) {
-                        // TODO: Just pass the response over
-                        // this.resp = resp;
-
-                        this.savePlaylistStatus = 'OK';
-                        this.savePlaylistResp = 'Done!';
-                        // TODO: Add checkmark
+                        this.resp.status = 'OK';
+                        this.resp.msg = 'Success!';
                     }.bind(this),
                 });
             },
@@ -257,7 +252,12 @@ $(document).ready(function() {
         name: 'SongBrowser',
         template: '#song-browser-template',
         data: function() {
-            return { album: {}, songs: [], optsToggle: '' };
+            return {
+                album: {},
+                songs: [],
+                optsToggle: '',
+                resp: { status: '', msg: '' },
+            };
         },
         created: function() { this.fetchSongs(); },
         mixins: [ helpers ],
@@ -286,21 +286,34 @@ $(document).ready(function() {
                     this.optsToggle = file;
                 }
             },
+
+            // Play now
             play: function(loc) {
                 loc = encodeURIComponent(loc);
+                // Clear playlist
                 $.post(baseURL + '/playlist/clear',
                     function(data) {
+                        // Add the song or album to playlist
                         $.post(baseURL + '/playlist/add?loc=' + loc,
                             function(data) {
-                                $.post(baseURL + '/playlist/play/-1');
-                            }
+                                // Start playing
+                                $.post(baseURL + '/playlist/play/-1',
+                                    function(resp) {
+                                        this.resp.status = 'OK';
+                                        this.resp.msg = 'Done!';
+                                    }.bind(this)
+                                );
+                            }.bind(this)
                         );
-                    }
+                    }.bind(this)
                 );
             },
             queue: function(loc) {
                 loc = encodeURIComponent(loc);
-                $.post(baseURL + '/playlist/add?loc=' + loc);
+                $.post(apiURL + '/playlist/add?loc=' + loc, function(resp) {
+                    this.resp.status = 'OK';
+                    this.resp.msg = 'Queued!';
+                }.bind(this));
             },
         }
     };
