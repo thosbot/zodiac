@@ -457,9 +457,16 @@ func findAlbums(w http.ResponseWriter, r *http.Request) {
 func findSongs(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// FIXME: Are "Various Artist" albums handled correctly?
+	args := []string{}
+
 	album := r.FormValue("album")
-	artist := r.FormValue("albumartist")
+	if album != "" {
+		args = append(args, "album", album)
+	}
+	albumartist := r.FormValue("albumartist")
+	if albumartist != "" {
+		args = append(args, "albumartist", albumartist)
+	}
 
 	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
@@ -477,7 +484,7 @@ func findSongs(w http.ResponseWriter, r *http.Request) {
 		Songs  []mpd.Attrs
 	}
 
-	list, err := mpdconn.Find("album", album)
+	list, err := mpdconn.Find(args...)
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd list"))
 		w.WriteHeader(http.StatusInternalServerError)
