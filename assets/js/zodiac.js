@@ -28,7 +28,7 @@ $(document).ready(function() {
             // Build album coverart link from a song filepath (artist/album/song)
             albumCoverFilepath: function(filepath) {
                 if ( ! filepath ) {
-                    return '';
+                    return '/img/albumart/album.jpg';
                 }
                 var f = filepath.split('/');
                 var c = 'img/albumart/' + encodeURIComponent(f[0]) +
@@ -77,7 +77,12 @@ $(document).ready(function() {
             },
 
             loadAltAlbumCover: function(evt) {
-                // event.target.src = "/img/albumart/album.jpg"
+                // Verify that the image exists on the server before we reset
+                // the image URL.
+                var altImgPath = '/img/albumart/album.jpg';
+                $.get(baseURL + altImgPath, (resp) => {
+                    evt.target.src = altImgPath;
+                });
             },
 
             getYear: function(date) {
