@@ -3,11 +3,13 @@ $(document).ready(function() {
     Vue.config.debug = true;
 
     var scrollPos = 0;
-    var baseURL = 'http://localhost:3000';
-    var wsURL = 'ws://localhost:3000/ws';
+
+    const baseURL = 'http://localhost';
+    const apiURL  = baseURL + ':3000';
+    const wsURL   = 'ws://localhost:3000/ws';
 
     // Global Vuex datastore
-    var store = new Vuex.Store({
+    const store = new Vuex.Store({
         state: {
             Status: {},
             CurrentSong: { Title: '', Artist: '' },
@@ -68,7 +70,7 @@ $(document).ready(function() {
             // The navbar currently lives outside the app, so we're updaing
             // the app so we're updating the old fashioned way.
             fetchNowPlaying: function() {
-                $.get(baseURL + '/now-playing', (resp) => {
+                $.get(apiURL + '/now-playing', (resp) => {
                     $('#now-playing').text(resp.Title);
                 })
                 .fail(function() { console.log('Error fetching current song'); });
@@ -120,15 +122,15 @@ $(document).ready(function() {
             // Player controls
             // NOTE: Updating the datastore is handled via messages received
             //       over the websocket.
-            play:  function() { $.post(baseURL + '/player/play') },
-            pause: function() { $.post(baseURL + '/player/pause') },
-            stop:  function() { $.post(baseURL + '/player/stop') },
-            next:  function() { $.post(baseURL + '/player/next') },
-            prev:  function() { $.post(baseURL + '/player/previous') },
-            clearPlaylist: function() { $.post(baseURL + '/playlist/clear') },
+            play:  function() { $.post(apiURL + '/player/play') },
+            pause: function() { $.post(apiURL + '/player/pause') },
+            stop:  function() { $.post(apiURL + '/player/stop') },
+            next:  function() { $.post(apiURL + '/player/next') },
+            prev:  function() { $.post(apiURL + '/player/previous') },
+
             adjustVolume: function(d) {
                 vol = parseInt(store.state.Status.volume) + d;
-                $.post(baseURL + '/volume/' + vol);
+                $.post(apiURL + '/volume/' + vol);
             },
 
             // *******
@@ -136,18 +138,21 @@ $(document).ready(function() {
             //
             // *******
 
+            // clearPlaylist removes all songs from the current playlist.
+            clearPlaylist: function() { $.post(apiURL + '/playlist/clear') },
+
             // plSongDivId generates an element ID for playlist members.
             plSongDivID: function(id) { return 'pl-song-' + id; },
 
             // Play a song from playlist by playlist position
             playPos: function(pos) {
-                $.post(baseURL + '/playlist/play/' + pos);
+                $.post(apiURL + '/playlist/play/' + pos);
             },
 
             // Deletes song from playlist by position
             deletePos: function(pos) {
                 scrollPos = $(window).scrollTop();
-                $.post(baseURL + '/playlist/delete/' + pos);
+                $.post(apiURL + '/playlist/delete/' + pos);
             },
 
             togglePlaylistOptsDiv: function() {
@@ -159,7 +164,7 @@ $(document).ready(function() {
                 var plName = document.getElementById('save-playlist-name').value;
 
                 $.ajax({
-                    url: baseURL + '/playlist/save',
+                    url: apiURL + '/playlist/save',
                     type: 'POST',
                     data: JSON.stringify({ Name: plName }),
                     contentType: 'application/json; charset=utf-8',
@@ -184,7 +189,8 @@ $(document).ready(function() {
         methods: {
             fetchArtists: function(listby) {
                 // Use EC2015 arrow notation to get at the component's `this`.
-                $.get(baseURL + '/list/' + listby, (resp) => {
+                // TODO: bind(this)
+                $.get(apiURL + '/list/' + listby, (resp) => {
                     this.artists = resp.List;
                 })
                 .fail(function() { console.log('Error fetching artist list'); });
@@ -203,7 +209,8 @@ $(document).ready(function() {
         methods: {
             fetchGenres: function(listby) {
                 // Use EC2015 arrow notation to get at the component's `this`.
-                $.get(baseURL + '/list/genre', (resp) => {
+                // TODO: bind(this)
+                $.get(apiURL + '/list/genre', (resp) => {
                     this.genres = resp.List;
                 })
                 .fail(function() { console.log('Error fetching genre list'); });
@@ -226,20 +233,20 @@ $(document).ready(function() {
 
                 if (artist && artist != "") {
                     artist = encodeURIComponent(artist);
-                    $.get(baseURL + '/find/albums?artist=' + artist, (resp) => {
+                    $.get(apiURL + '/find/albums?artist=' + artist, (resp) => {
                         this.albums = resp.Albums;
                     })
                     .fail(function() { console.log('Error fetching album list'); });
                 }
                 else if (genre && genre != "") {
                     genre = encodeURIComponent(genre);
-                    $.get(baseURL + '/find/albums?genre=' + genre, (resp) => {
+                    $.get(apiURL + '/find/albums?genre=' + genre, (resp) => {
                         this.albums = resp.Albums;
                     })
                     .fail(function() { console.log('Error fetching album list'); });
                 }
                 else {
-                    $.get(baseURL + '/list/albums', (resp) => {
+                    $.get(apiURL + '/list/albums', (resp) => {
                         this.albums = resp.Albums;
                     })
                     .fail(function() { console.log('Error fetching album list'); });
@@ -291,13 +298,13 @@ $(document).ready(function() {
             play: function(loc) {
                 loc = encodeURIComponent(loc);
                 // Clear playlist
-                $.post(baseURL + '/playlist/clear',
+                $.post(apiURL + '/playlist/clear',
                     function(data) {
                         // Add the song or album to playlist
-                        $.post(baseURL + '/playlist/add?loc=' + loc,
+                        $.post(apiURL + '/playlist/add?loc=' + loc,
                             function(data) {
                                 // Start playing
-                                $.post(baseURL + '/playlist/play/-1',
+                                $.post(apiURL + '/playlist/play/-1',
                                     function(resp) {
                                         this.resp.status = 'OK';
                                         this.resp.msg = 'Done!';
@@ -329,18 +336,19 @@ $(document).ready(function() {
         methods: {
             fetchPlaylists: function(listby) {
                 // Use EC2015 arrow notation to get at the component's `this`.
-                $.get(baseURL + '/playlists', (resp) => {
+                // TODO: Bind this.
+                $.get(apiURL + '/playlists', (resp) => {
                     this.playlists = resp.Playlists;
                 })
                 .fail(function() { console.log('Error fetching playlists'); });
             },
             play: function(name) {
                 name = encodeURIComponent(name);
-                $.post(baseURL + '/playlist/clear',
+                $.post(apiURL + '/playlist/clear',
                     function(data) {
-                        $.post(baseURL + '/playlist/load/' + name,
+                        $.post(apiURL + '/playlist/load/' + name,
                             function(data) {
-                                $.post(baseURL + '/playlist/play/-1');
+                                $.post(apiURL + '/playlist/play/-1');
                             }
                         );
                     }
@@ -348,7 +356,7 @@ $(document).ready(function() {
             },
             queue: function(name) {
                 loc = encodeURIComponent(loc);
-                $.post(baseURL + '/playlist/load/' + name);
+                $.post(apiURL + '/playlist/load/' + name);
             },
         },
     };
