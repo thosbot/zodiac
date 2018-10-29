@@ -152,7 +152,7 @@ $(document).ready( function() {
                 this.showPlaylistOpts = !this.showPlaylistOpts;
             },
 
-            saveCurrPlaylist: function(evt) {
+            saveCurrentPlaylist: function(evt) {
                 evt.preventDefault();
                 var plName = document.getElementById('save-playlist-name').value;
 

@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <!-- meta -->
-        <meta http-equiv="Content-Type" content="text/html; charset=[% settings.charset %]">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <meta name="description" content="">
@@ -121,13 +121,15 @@
                                 </span>
                             </div>
                         </div>
+
                         <div v-if="playlist[0] && showPlaylistOpts === true" style="margin:1em;">
                             <form class="form-inline">
                                 <div class="form-group">
                                     <label for="save-playlist-name">Save playlist as:</label>
                                     <input type="text" class="form-control" id="save-playlist-name" placeholder="Super cool tunes">
                                 </div>
-                                <button v-on:click="saveCurrPlaylist" class="btn btn-primary" type="submit">
+
+                                <button v-on:click="saveCurrentPlaylist" class="btn btn-primary" type="submit">
                                     <i class="fa fa-save"></i>
                                 </button>
                                 <span
@@ -223,6 +225,7 @@
                                 style="width: 100%;"
                             >
                         </div>
+
                         <div class="media-body">
                             <div>
                                 <span class="lead">{{album.Title}}</span><br>
@@ -320,6 +323,7 @@
 
         <script src="vendor/js/jquery.min.js"></script>
         <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+        <!-- TODO: <script src="vendor/js/bootstrap-native.js"></script> -->
         <script src="vendor/js/vue.js"></script>
         <script src="vendor/js/vuex.js"></script>
         <script src="vendor/js/vue-router.js"></script>
