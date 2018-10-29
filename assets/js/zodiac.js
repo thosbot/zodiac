@@ -1,4 +1,4 @@
-$(document).ready( function() {
+$(document).ready(function() {
     Vue.config.devtools = true;
     Vue.config.debug = true;
 
@@ -132,9 +132,12 @@ $(document).ready( function() {
                 $.post(baseURL + '/volume/' + vol);
             },
 
+            // *******
             // Playlist controls
+            //
+            // *******
 
-            // Generate an ID for playlist members
+            // plSongDivId generates an element ID for playlist members.
             plSongDivID: function(id) { return 'pl-song-' + id; },
 
             // Play a song from playlist by playlist position
@@ -263,6 +266,8 @@ $(document).ready( function() {
                 var album = encodeURIComponent(this.$route.query.album);
                 $.get(baseURL + '/find/songs?album=' + album, (resp) => {
                     this.album = resp;
+
+                    // Set a various artist boolean
                     if (
                         this.album.Artist === "Various Artists" ||
                         this.album.Artist === "Various"
@@ -272,6 +277,8 @@ $(document).ready( function() {
                 })
                 .fail(function() { console.log('Error fetching album list'); });
             },
+
+            // Show or hide options for song
             toggleOptsDiv: function(file) {
                 if ( this.optsToggle === file ) {
                     this.optsToggle = '';
@@ -407,4 +414,4 @@ $(document).ready( function() {
         computed: {},
         methods: {}
     });
-} );
+});
