@@ -202,8 +202,8 @@
                         <div class="panel panel-default browser-item" style="height:7em;">
                             <div class="panel-body">
                                 <!-- TODO: Add artist to query -->
-                                <router-link :to="{ path: 'songs', query: { album: album.Title } }" tag="div">
-                                    <div class="album-title-trunc">{{album.Title}}</div>
+                                <router-link :to="{ path: 'songs', query: { album: album.Title, artist: album.Artist } }" tag="div">
+                                    <div class="album-title-trunc"><strong>{{album.Title}}</strong></div>
                                     {{album.Artist}}<br>
                                     <span v-if="album.Date">{{getYear(album.Date)}}</span>
                                 </router-link>

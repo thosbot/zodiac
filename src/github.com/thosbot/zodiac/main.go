@@ -348,19 +348,22 @@ func listAlbums(w http.ResponseWriter, r *http.Request) {
 	// Iterate over the slice of "key: values" returned. Each album will begin
 	// with the "Album" key.
 	album := Album{}
-	for {
-		// We're popping off the slice until it's empty
-		if len(list) == 0 {
-			break
+	for _, rec := range list {
+		// Get the key/val by splitting the string on the first colon found.
+		// FIXME: You're sunk if there's a colon in the band name.
+		key, val := "", ""
+		i := strings.Index(rec, ": ")
+		if i > 0 {
+			key = rec[:i]
+			val = rec[i+2:]
+		} else {
+			log.Println(fmt.Errorf("list albums: cannot parse %s", rec))
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 
-		// Get the next item and "pop" it off the slice
-		rec := strings.Split(list[0], ": ")
-		key, val := rec[0], rec[1]
-		list = list[1:]
-
 		// We'll know to start a new album object when we receive but have
-		// already captured the album title.
+		// already captured an album title.
 		if key == "Album" && album.Title != "" {
 			resp.Albums = append(resp.Albums, album)
 			// Clear out the struct
@@ -454,9 +457,9 @@ func findAlbums(w http.ResponseWriter, r *http.Request) {
 func findSongs(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	// FIXME: Are "Various Artist" albums handled correctly?
 	album := r.FormValue("album")
-	// FIXME: Will prob need album or album artist, but what to do with various
-	//        artists?
+	artist := r.FormValue("albumartist")
 
 	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")

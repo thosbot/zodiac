@@ -270,8 +270,15 @@ $(document).ready(function() {
         mixins: [ helpers ],
         methods: {
             fetchSongs: function() {
-                var album = encodeURIComponent(this.$route.query.album);
-                $.get(baseURL + '/find/songs?album=' + album, (resp) => {
+                var param = {};
+                if (this.$route.query.album != "") {
+                    param.album = this.$route.query.album;
+                }
+                if (this.$route.query.artist != "") {
+                    param.albumartist = this.$route.query.artist;
+                }
+
+                $.get(apiURL + '/find/songs', param, (resp) => {
                     this.album = resp;
 
                     // Set a various artist boolean
@@ -315,6 +322,7 @@ $(document).ready(function() {
                     }.bind(this)
                 );
             },
+            // Add a song or album to bottom of queue
             queue: function(loc) {
                 loc = encodeURIComponent(loc);
                 $.post(apiURL + '/playlist/add?loc=' + loc, function(resp) {
