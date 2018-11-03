@@ -2,8 +2,9 @@
 <html lang="en">
     <head>
         <!-- meta -->
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
 
         <meta name="description" content="">
         <meta name="author" content="Thosbot">
@@ -20,6 +21,8 @@
 
     <body>
         <div id="juke-app">
+
+            <!-- navbar -->
             <nav id="navbar" class="navbar navbar-default navbar-fixed-top">
                 <div class="container">
                     <div class="navbar-header">
@@ -42,10 +45,12 @@
                     </div>
                 </div>
             </nav>
+            <!-- /navbar -->
 
             <router-view></router-view>
         </div>
 
+        <!-- home -->
         <template id="home-template">
             <div id="home" class="container">
                 <div id="player" class="col-sm-12 col-md-7 col-md-offset-1">
@@ -105,6 +110,7 @@
                     </div><!-- /media -->
                 </div><!-- /now-playing -->
 
+                <!-- curr-playlist -->
                 <div id="curr-playlist" class="col-sm-12 col-md-7 col-md-offset-1">
                     <h1>Playlist</h1>
                     <div style="padding: 0.5em;">
@@ -133,7 +139,7 @@
                                     <i class="fa fa-save"></i>
                                 </button>
 
-                                <!-- Response -->
+                                <!-- response -->
                                 <span v-bind:class="{ 'msg msg-success': resp.status === 'OK', 'msg msg-danger': resp.status === 'ERR' }">
                                     <i v-bind:class="{ 'fa fa-check': resp.status === 'OK', 'fa fa-exclamation': resp.status === 'ERR' }"></i>
                                     {{resp.msg}}
@@ -170,6 +176,7 @@
                 </div><!-- /curr-playlist -->
             </div>
         </template>
+        <!-- /home -->
 
         <template id="artist-browser-template">
             <div id="artist-browser" class="container">
@@ -239,7 +246,7 @@
                                         <i class="fa fa-plus"></i>
                                     </button>
 
-                                    <!-- Response -->
+                                    <!-- response -->
                                     <span v-bind:class="{ 'msg msg-success': resp.status === 'OK', 'msg msg-danger': resp.status === 'ERR' }">
                                         <i v-bind:class="{ 'fa fa-check': resp.status === 'OK', 'fa fa-exclamation': resp.status === 'ERR' }"></i>
                                         {{resp.msg}}
