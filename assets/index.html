@@ -192,11 +192,9 @@
 
                     <div v-for="artist in artists" class="col-md-4">
                         <div class="panel panel-default browser-item">
-                            <div class="panel-body">
-                                <router-link :to="{ path: 'albums', query: { artist: artist } }" tag="div">
-                                    {{artist}}
-                                </router-link>
-                            </div>
+                            <router-link :to="{ path: 'albums', query: { artist: artist } }" tag="div" class="panel-body">
+                                {{artist}}
+                            </router-link>
                         </div>
                     </div>
                 </div>
@@ -211,14 +209,11 @@
 
                     <div v-for="album in albums" class="col-sm-6 col-md-4">
                         <div class="panel panel-default browser-item" style="height:7em;">
-                            <div class="panel-body">
-                                <!-- TODO: Add artist to query -->
-                                <router-link :to="{ path: 'songs', query: { album: album.Title, artist: album.Artist } }" tag="div">
-                                    <div class="album-title-trunc"><strong>{{album.Title}}</strong></div>
-                                    {{album.Artist}}<br>
-                                    <span v-if="album.Date">{{getYear(album.Date)}}</span>
-                                </router-link>
-                            </div>
+                            <router-link :to="{ path: 'songs', query: { album: album.Title, artist: album.Artist } }" tag="div" class="panel-body">
+                                <div class="album-title-trunc"><strong>{{album.Title}}</strong></div>
+                                {{album.Artist}}<br>
+                                <span v-if="album.Date">{{getYear(album.Date)}}</span>
+                            </router-link>
                         </div>
                     </div>
                 </div>
@@ -291,14 +286,9 @@
 
                     <div v-for="genre in genres" class="col-md-4">
                         <div class="panel panel-default browser-item">
-                            <div class="panel-body">
-                                <router-link
-                                    :to="{ path: 'albums', query: { genre: genre } }"
-                                    tag="div"
-                                >
-                                    {{genre}}
-                                </router-link>
-                            </div>
+                            <router-link :to="{ path: 'albums', query: { genre: genre } }" tag="div" class="panel-body">
+                                {{genre}}
+                            </router-link>
                         </div>
                     </div>
                 </div>
