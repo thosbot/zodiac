@@ -44,8 +44,7 @@
                         </p>
                     </div>
                 </div>
-            </nav>
-            <!-- /navbar -->
+            </nav><!-- /navbar -->
 
             <router-view></router-view>
         </div>
@@ -53,6 +52,8 @@
         <!-- home -->
         <template id="home-template">
             <div id="home" class="container">
+
+                <!-- now-playing -->
                 <div id="player" class="col-sm-12 col-md-7 col-md-offset-1">
                     <h1>Now Playing</h1>
 
@@ -73,6 +74,7 @@
                                 <em>{{currentsong.Album}}</em>, {{getYear(currentsong.Date)}}.
                             </div>
 
+                            <!-- player-controls -->
                             <div class="btn-toolbar" style="margin-top:1em;">
                                 <div id="player-controls" v-bind:class="status.state" class="btn-group btn-group-lg">
                                     <button id="mpd-prev" v-on:click="prev" class="btn btn-default">
@@ -106,8 +108,8 @@
                                 </div>
                             </div><!-- /player-controls -->
 
-                        </div><!-- /media-body -->
-                    </div><!-- /media -->
+                        </div>
+                    </div>
                 </div><!-- /now-playing -->
 
                 <!-- curr-playlist -->
@@ -174,10 +176,11 @@
                         </div>
                     </div>
                 </div><!-- /curr-playlist -->
-            </div>
-        </template>
-        <!-- /home -->
 
+            </div>
+        </template><!-- /home -->
+
+        <!-- artist-browser -->
         <template id="artist-browser-template">
             <div id="artist-browser" class="container">
                 <div>
@@ -197,9 +200,10 @@
                         </div>
                     </div>
                 </div>
-            </div><!-- /artist-browser -->
-        </template><!-- /artist-browser-template -->
+            </div>
+        </template><!-- /artist-browser -->
 
+        <!-- album-browser -->
         <template id="album-browser-template">
             <div id="album-browser" class="container">
                 <div>
@@ -218,9 +222,10 @@
                         </div>
                     </div>
                 </div>
-            </div><!-- /album-browser -->
-        </template><!-- /album-browser-template -->
+            </div>
+        </template><!-- /album-browser -->
 
+        <!-- song-browser -->
         <template id="song-browser-template">
             <div id="song-browser" class="container">
                 <div class="col-sm-12 col-md-10 col-md-offset-1">
@@ -261,6 +266,7 @@
                                         <span v-if="album.Various">- {{song.Artist}}</span>
                                         <span class="pull-right">{{seconds2HMS(song.Time)}}</span>
                                     </div>
+
                                     <div v-show="optsToggle === song.file" class="btn-group-sm" style="margin: 1em 1em">
                                         <button v-on:click="play(song.file)" class="btn btn-default">
                                             <i class="fa fa-play"></i>
@@ -274,9 +280,10 @@
                         </div>
                     </div>
                 </div>
-            </div><!-- /song-browser -->
-        </template><!-- /song-browser-tempate -->
+            </div>
+        </template><!-- /song-browser -->
 
+        <!-- genre-browser -->
         <template id="genre-browser-template">
             <div id="genre-browser" class="container">
                 <div>
@@ -295,9 +302,10 @@
                         </div>
                     </div>
                 </div>
-            </div><!-- /genre-browser -->
-        </template><!-- /genre-browser-template -->
+            </div>
+        </template><!-- /genre-browser -->
 
+        <!-- playlist-browser -->
         <template id="playlist-browser-template">
             <div id="playlist-browser" class="container">
                 <div>
@@ -332,8 +340,8 @@
                         </div>
                     </div>
                 </div>
-            </div><!-- /playlist-browser -->
-        </template><!-- /playlist-browser-template -->
+            </div>
+        </template><!-- /playlist-browser -->
 
         <script src="vendor/js/jquery.min.js"></script>
         <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
