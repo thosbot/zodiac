@@ -32,7 +32,7 @@ $(document).ready(function() {
                 }
                 var f = filepath.split('/');
                 var c = 'img/albumart/' + encodeURIComponent(f[0]) +
-                    '__' + encodeURIComponent(f[1]) + '__cover' + '.png';
+                    '__' + encodeURIComponent(f[1]) + '__cover' + '.jpg';
                 return c;
             },
 
