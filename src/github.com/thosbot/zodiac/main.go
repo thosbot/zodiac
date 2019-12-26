@@ -340,11 +340,11 @@ func listAlbums(w http.ResponseWriter, r *http.Request) {
 	}
 	resp := Resp{}
 
-	// Iterate over the slice of "key: values" returned. Each album will begin
-	// with the "Album" key.
+	// Keep track of attribute keys seen so we know when to start a new album
+	attr := make(map[string]bool)
+
 	album := Album{}
 	for _, rec := range list {
-		// Get the key/val by splitting the string on the first colon found.
 		// FIXME: You're sunk if there's a colon in the band name.
 		key, val := "", ""
 		i := strings.Index(rec, ": ")
@@ -357,16 +357,14 @@ func listAlbums(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// We'll know to start a new album object when we receive but have
-		// already captured an album title.
-		if key == "Album" && album.Title != "" {
+		// Start a new album as soon as we find a duplicate key
+		if attr[key] == true {
 			resp.Albums = append(resp.Albums, album)
-			// Clear out the struct
+			attr = make(map[string]bool)
 			album = Album{}
-			continue
 		}
+		attr[key] = true
 
-		// Write the value to its correct struct position
 		if key == "Album" {
 			album.Title = val
 		} else if key == "AlbumArtist" {
