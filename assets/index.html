@@ -255,7 +255,7 @@
                             </div>
 
                             <ul class="song-list">
-                                <li v-for="song in album.Songs" class="browser-item">
+                                <li v-for="(song, idx) in album.Songs" v-bind:id="'song-' + idx" class="browser-item">
                                     <div v-on:click="toggleOptsDiv(song.file)">
                                         {{song.Track}}. {{song.Title}}
                                         <span v-if="album.Various">- {{song.Artist}}</span>
@@ -263,13 +263,19 @@
                                     </div>
 
                                     <div v-show="optsToggle === song.file" class="btn-group-sm" style="margin: 1em 1em">
-                                        <button v-on:click="play(song.file)" class="btn btn-default">
+                                        <button v-bind:id="idx" v-on:click="play(song.file)" class="btn btn-default">
                                             <i class="fa fa-play"></i>
                                         </button>
                                         <button v-on:click="queue(song.file)" class="btn btn-default">
                                             <i class="fa fa-plus"></i>
                                         </button>
-                                    </div>
+
+                                        <!-- response -->
+                                        <span id="'song-' + idx + '-resp'" v-bind:class="{ 'msg msg-success': resp.status === 'OK', 'msg msg-danger': resp.status === 'ERR' }">
+                                            <i v-bind:class="{ 'fa fa-check': resp.status === 'OK', 'fa fa-exclamation': resp.status === 'ERR' }"></i>
+                                            {{resp.msg}}
+                                        </span>
+                                    </div><!-- /opts -->
                                 </li>
                             </ul>
                         </div>
