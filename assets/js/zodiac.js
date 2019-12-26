@@ -1,4 +1,9 @@
-$(document).ready(function() {
+var ready = (callback) => {
+  if (document.readyState != "loading") callback();
+  else document.addEventListener("DOMContentLoaded", callback);
+}
+
+ready(() => {
     Vue.config.devtools = true;
     Vue.config.debug = true;
 
@@ -25,13 +30,13 @@ $(document).ready(function() {
     // Mixins
     var helpers = {
         methods: {
-            // Build album coverart link from a song filepath (artist/album/song)
+            // Build albumart link from a song filepath (artist/album/song)
             albumCoverFilepath: function(filepath) {
                 if ( ! filepath ) {
                     return '/img/albumart/album.jpg';
                 }
-                var f = filepath.split('/');
-                var c = 'img/albumart/' + encodeURIComponent(f[0]) +
+                let f = filepath.split('/');
+                let c = 'img/albumart/' + encodeURIComponent(f[0]) +
                     '__' + encodeURIComponent(f[1]) + '__cover' + '.jpg';
                 return c;
             },
@@ -39,11 +44,11 @@ $(document).ready(function() {
             // Convert seconds count to H:MM:SS
             seconds2HMS: function(sec) {
                 // Double-tilde is double-bitwise-not, same as Math.floor()
-                var h = ~~( sec / 3600 );
-                var m = ~~(( sec % 3600 ) / 60 );
-                var s = ~~sec % 60;
+                let h = ~~( sec / 3600 );
+                let m = ~~(( sec % 3600 ) / 60 );
+                let s = ~~sec % 60;
 
-                var t = '';
+                let t = '';
                 // Pad out zeros for display
                 if ( h > 0 ) {
                     t = h + ':' + ( m < 10 ? '0' : '' );
@@ -54,11 +59,11 @@ $(document).ready(function() {
 
             seconds2Time: function(sec) {
                 // Double-tilde is double-bitwise-not, same as Math.floor()
-                var h = ~~( sec / 3600 );
-                var m = ~~(( sec % 3600 ) / 60 );
-                var s = ~~sec % 60;
+                let h = ~~( sec / 3600 );
+                let m = ~~(( sec % 3600 ) / 60 );
+                let s = ~~sec % 60;
 
-                var t = '';
+                let t = '';
                 if ( h > 0 ) {
                     t = h + ' hour' + ( h > 1 ? 's' : '' ) + ', ';
                 }
@@ -70,19 +75,38 @@ $(document).ready(function() {
             // The navbar currently lives outside the app, so we're updaing
             // the app so we're updating the old fashioned way.
             fetchNowPlaying: function() {
-                $.get(apiURL + '/now-playing', (resp) => {
-                    $('#now-playing').text(resp.Title);
-                })
-                .fail(function() { console.log('Error fetching current song'); });
+                let self = this;
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', apiURL + '/now-playing', true);
+                xhr.onload = function() {
+                    if (this.status >= 200 && this.status < 400) {
+                        let resp = JSON.parse(this.response);
+                        document.getElementById('now-playing').textContent = resp.Title;
+                    } else {
+                        console.log('Error getting current song');
+                    }
+                };
+                xhr.onerror = function(){ console.log('Error getting current song'); };
+                xhr.send();
             },
 
             loadAltAlbumCover: function(evt) {
                 // Verify that the image exists on the server before we reset
                 // the image URL.
-                var altImgPath = '/img/albumart/album.jpg';
-                $.get(baseURL + altImgPath, (resp) => {
-                    evt.target.src = altImgPath;
-                });
+                let altImgPath = '/img/albumart/album.jpg';
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', baseURL + altImgPath, true);
+                xhr.onload = function() {
+                    if (this.status >= 200 && this.status < 400) {
+                        evt.target.src = altImgPath;
+                    } else {
+                        console.log('Error getting album cover');
+                    }
+                };
+                xhr.onerror = function(){ console.log('Error getting album cover'); };
+                xhr.send();
             },
 
             getYear: function(date) {
@@ -108,6 +132,7 @@ $(document).ready(function() {
             playlist () { return store.state.Playlist },
             status () { return store.state.Status; },
 
+            // Computed properties are cached based on their dependencies
             playliststats () {
                 numSongs = store.state.Status.playlistlength;
                 duration = 0;
@@ -127,15 +152,36 @@ $(document).ready(function() {
             // Player controls
             // NOTE: Updating the datastore is handled via messages received
             //       over the websocket.
-            play:  function() { $.post(apiURL + '/player/play') },
-            pause: function() { $.post(apiURL + '/player/pause') },
-            stop:  function() { $.post(apiURL + '/player/stop') },
-            next:  function() { $.post(apiURL + '/player/next') },
-            prev:  function() { $.post(apiURL + '/player/previous') },
-
+            play:  function() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/player/play', true);
+                xhr.send();
+            },
+            pause: function() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/player/pause', true);
+                xhr.send();
+            },
+            stop:  function() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/player/stop', true);
+                xhr.send();
+            },
+            next:  function() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/player/next', true);
+                xhr.send();
+            },
+            prev:  function() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/player/previous', true);
+                xhr.send();
+            },
             adjustVolume: function(d) {
+                let xhr = new XMLHttpRequest();
                 vol = parseInt(store.state.Status.volume) + d;
-                $.post(apiURL + '/volume/' + vol);
+                xhr.open('POST', apiURL + '/volume/' + vol, true);
+                xhr.send();
             },
 
             // *******
@@ -144,20 +190,29 @@ $(document).ready(function() {
             // *******
 
             // clearPlaylist removes all songs from the current playlist.
-            clearPlaylist: function() { $.post(apiURL + '/playlist/clear') },
+            clearPlaylist: function() {
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/playlist/clear', true);
+                xhr.send();
+            },
 
             // plSongDivId generates an element ID for playlist members.
             plSongDivID: function(id) { return 'pl-song-' + id; },
 
             // Play a song from playlist by playlist position
             playPos: function(pos) {
-                $.post(apiURL + '/playlist/play/' + pos);
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/playlist/play/' + pos, true);
+                xhr.send();
             },
 
             // Deletes song from playlist by position
             deletePos: function(pos) {
-                scrollPos = $(window).scrollTop();
-                $.post(apiURL + '/playlist/delete/' + pos);
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/playlist/delete/' + pos, true);
+                xhr.send();
+                // TODO: Vanilla JS
+                // scrollPos = $(window).scrollTop();
             },
 
             togglePlaylistOptsDiv: function() {
@@ -166,19 +221,23 @@ $(document).ready(function() {
 
             saveCurrentPlaylist: function(evt) {
                 evt.preventDefault();
-                var plName = document.getElementById('save-playlist-name').value;
 
-                $.ajax({
-                    url: apiURL + '/playlist/save',
-                    type: 'POST',
-                    data: JSON.stringify({ Name: plName }),
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    success: function(resp) {
-                        this.resp.status = 'OK';
-                        this.resp.msg = 'Success!';
-                    }.bind(this),
-                });
+                let self = this;
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/playlist/save', true);
+                xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+                xhr.onload = function() {
+                    if (this.status >= 200 && this.status < 400) {
+                        self.resp.status = 'OK';
+                        self.resp.msg = 'Success!';
+                    } else {
+                        console.log('Error saving playlist');
+                    }
+                };
+                xhr.onerror = function(){ console.log('Error saving playlist'); };
+                let plName = document.getElementById('save-playlist-name').value;
+                xhr.send(JSON.stringify( {Name: plName} ));
             },
         },
     };
@@ -193,12 +252,20 @@ $(document).ready(function() {
         mixins: [ helpers ],
         methods: {
             fetchArtists: function(listby) {
-                // Use EC2015 arrow notation to get at the component's `this`.
-                // TODO: bind(this)
-                $.get(apiURL + '/list/' + listby, (resp) => {
-                    this.artists = resp.List;
-                })
-                .fail(function() { console.log('Error fetching artist list'); });
+                let self = this;
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', apiURL + '/list/' + listby, true);
+                xhr.onload = function() {
+                    if (this.status >= 200 && this.status < 400) {
+                        let resp = JSON.parse(this.response);
+                        self.artists = resp.List;
+                    } else {
+                        console.log('Error getting artist list');
+                    }
+                };
+                xhr.onerror = function(){ console.log('Error getting artist list'); };
+                xhr.send();
             },
         },
     };
@@ -213,12 +280,20 @@ $(document).ready(function() {
         mixins: [ helpers ],
         methods: {
             fetchGenres: function(listby) {
-                // Use EC2015 arrow notation to get at the component's `this`.
-                // TODO: bind(this)
-                $.get(apiURL + '/list/genre', (resp) => {
-                    this.genres = resp.List;
-                })
-                .fail(function() { console.log('Error fetching genre list'); });
+                let self = this;
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', apiURL + '/list/genre', true);
+                xhr.onload = function() {
+                    if (this.status >= 200 && this.status < 400) {
+                        let resp = JSON.parse(this.response);
+                        self.genres = resp.List;
+                    } else {
+                        console.log('Error getting genres');
+                    }
+                };
+                xhr.onerror = function(){ console.log('Error getting genres'); };
+                xhr.send();
             },
         },
     };
@@ -233,29 +308,34 @@ $(document).ready(function() {
         mixins: [ helpers ],
         methods: {
             fetchAlbums: function() {
-                var artist = this.$route.query.artist;
-                var genre = this.$route.query.genre;
+                let self = this;
+                let xhr = new XMLHttpRequest();
+
+                let artist = this.$route.query.artist;
+                let genre = this.$route.query.genre;
 
                 if (artist && artist != "") {
                     artist = encodeURIComponent(artist);
-                    $.get(apiURL + '/find/albums?artist=' + artist, (resp) => {
-                        this.albums = resp.Albums;
-                    })
-                    .fail(function() { console.log('Error fetching album list'); });
+                    xhr.open('GET', apiURL + '/find/albums?artist=' + artist, true);
                 }
                 else if (genre && genre != "") {
                     genre = encodeURIComponent(genre);
-                    $.get(apiURL + '/find/albums?genre=' + genre, (resp) => {
-                        this.albums = resp.Albums;
-                    })
-                    .fail(function() { console.log('Error fetching album list'); });
+                    xhr.open('GET', apiURL + '/find/albums?genre=' + genre, true);
                 }
                 else {
-                    $.get(apiURL + '/list/albums', (resp) => {
-                        this.albums = resp.Albums;
-                    })
-                    .fail(function() { console.log('Error fetching album list'); });
+                    xhr.open('GET', apiURL + '/list/albums', true);
                 }
+
+                xhr.onload = function() {
+                    if (this.status >= 200 && this.status < 400) {
+                        let resp = JSON.parse(this.response);
+                        self.albums = resp.Albums
+                    } else {
+                        console.log('Error getting album list');
+                    }
+                };
+                xhr.onerror = function(){ console.log('Error getting album list'); };
+                xhr.send();
             },
         },
     };
@@ -275,26 +355,39 @@ $(document).ready(function() {
         mixins: [ helpers ],
         methods: {
             fetchSongs: function() {
-                var param = {};
+                let params = [];
                 if (this.$route.query.album != "") {
-                    param.album = this.$route.query.album;
+                    params.push("album=" + encodeURIComponent(this.$route.query.album));
                 }
                 if (this.$route.query.artist != "") {
-                    param.albumartist = this.$route.query.artist;
+                    params.push("param.albumartist" + encodeURIComponent(this.$route.query.artist));
                 }
 
-                $.get(apiURL + '/find/songs', param, (resp) => {
-                    this.album = resp;
+                let qstr = '';
+                if (params.length > 0) {
+                    qstr = "?" + params.join('&');
+                }
 
-                    // Set a various artist boolean
-                    if (
-                        this.album.Artist === "Various Artists" ||
-                        this.album.Artist === "Various"
-                    ) {
-                        this.album.Various = true;
+                let self = this;
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', apiURL + '/find/songs' + qstr, true);
+                xhr.onload = function() {
+                    if (this.status >= 200 && this.status < 400) {
+                        self.album = JSON.parse(this.response);
+
+                        if (
+                            self.album.Artist === "Various Artists" ||
+                            self.album.Artist === "Various"
+                        ) {
+                            self.album.Various = true;
+                        }
+                    } else {
+                        console.log('Error finding songs');
                     }
-                })
-                .fail(function() { console.log('Error fetching album list'); });
+                };
+                xhr.onerror = function(){ console.log('Error finding songs'); };
+                xhr.send();
             },
 
             // Show or hide options for song
@@ -308,32 +401,74 @@ $(document).ready(function() {
 
             // Play now
             play: function(loc) {
+                let self = this;
+                let xhr = new XMLHttpRequest();
+
+                // Clear current playlist
+                xhr.open('POST', apiURL + '/playlist/clear', true);
+                xhr.onload = function() {
+                    if (this.status < 200 && this.status >= 400) {
+                        console.log('Error clearing playlist');
+                        return;
+                    }
+                };
+                xhr.onerror = function(){
+                    console.log('Error clearing playlist');
+                    return;
+                };
+                xhr.send();
+
+                // Add the song or album to playlist
+                xhr = new XMLHttpRequest();
                 loc = encodeURIComponent(loc);
-                // Clear playlist
-                $.post(apiURL + '/playlist/clear',
-                    function(data) {
-                        // Add the song or album to playlist
-                        $.post(apiURL + '/playlist/add?loc=' + loc,
-                            function(data) {
-                                // Start playing
-                                $.post(apiURL + '/playlist/play/-1',
-                                    function(resp) {
-                                        this.resp.status = 'OK';
-                                        this.resp.msg = 'Done!';
-                                    }.bind(this)
-                                );
-                            }.bind(this)
-                        );
-                    }.bind(this)
-                );
+                xhr.open('POST', apiURL + '/playlist/add?loc=' + loc, true);
+                xhr.onload = function() {
+                    if (this.status < 200 && this.status >= 400) {
+                        console.log('Error adding song(s) to playlist');
+                        return;
+                    }
+                };
+                xhr.onerror = function(){
+                    console.log('Error adding song(s) to playlist');
+                    return;
+                };
+                xhr.send();
+
+                // Play
+                xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/playlist/play/-1', true);
+                xhr.onload = function() {
+                    if (this.status < 200 && this.status >= 400) {
+                        console.log('Error playing');
+                        return;
+                    }
+                    self.resp.status = 'OK';
+                    self.resp.msg = 'Done!';
+                };
+                xhr.onerror = function(){
+                    console.log('Error playing');
+                    return;
+                };
+                xhr.send();
             },
+
             // Add a song or album to bottom of queue
             queue: function(loc) {
+                let self = this;
+                let xhr = new XMLHttpRequest();
+
                 loc = encodeURIComponent(loc);
-                $.post(apiURL + '/playlist/add?loc=' + loc, function(resp) {
-                    this.resp.status = 'OK';
-                    this.resp.msg = 'Queued!';
-                }.bind(this));
+                xhr.open('POST', apiURL + '/playlist/add?loc=' + loc, true);
+                xhr.onload = function() {
+                    if (this.status >= 200 && this.status < 400) {
+                        self.resp.status = 'OK';
+                        self.resp.msg = 'Queued!';
+                    } else {
+                        console.log('Error adding song to queue');
+                    }
+                };
+                xhr.onerror = function(){ console.log('Error adding song to queue'); };
+                xhr.send();
             },
         }
     };
@@ -348,28 +483,83 @@ $(document).ready(function() {
         mixins: [ helpers ],
         methods: {
             fetchPlaylists: function(listby) {
-                // Use EC2015 arrow notation to get at the component's `this`.
-                // TODO: Bind this.
-                $.get(apiURL + '/playlists', (resp) => {
-                    this.playlists = resp.Playlists;
-                })
-                .fail(function() { console.log('Error fetching playlists'); });
-            },
-            play: function(name) {
-                name = encodeURIComponent(name);
-                $.post(apiURL + '/playlist/clear',
-                    function(data) {
-                        $.post(apiURL + '/playlist/load/' + name,
-                            function(data) {
-                                $.post(apiURL + '/playlist/play/-1');
-                            }
-                        );
+                let self = this;
+
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', apiURL + '/playlists', true);
+                xhr.onload = function() {
+                    if (this.status >= 200 && this.status < 400) {
+                        let resp = JSON.parse(this.response);
+                        self.playlists = resp.Playlists;
+                    } else {
+                        console.log('Error getting playlists');
                     }
-                );
+                };
+                xhr.onerror = function(){ console.log('Error getting playlists'); };
+                xhr.send();
             },
-            queue: function(name) {
+            play: function(loc) {
+                // Clear current playlist
+                let xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/playlist/clear', true);
+                xhr.onload = function() {
+                    if (this.status < 200 && this.status >= 400) {
+                        console.log('Error clearing playlist');
+                        return;
+                    }
+                };
+                xhr.onerror = function(){
+                    console.log('Error clearing playlist');
+                    return;
+                };
+                xhr.send();
+
+                // Load new playlist
+                xhr = new XMLHttpRequest();
                 loc = encodeURIComponent(loc);
-                $.post(apiURL + '/playlist/load/' + name);
+                xhr.open('POST', apiURL + '/playlist/load/' + loc, true);
+                xhr.onload = function() {
+                    if (this.status < 200 && this.status >= 400) {
+                        console.log('Error loading playlist');
+                        return;
+                    }
+                };
+                xhr.onerror = function(){
+                    console.log('Error loading playlist');
+                    return;
+                };
+                xhr.send();
+
+                // Play
+                xhr = new XMLHttpRequest();
+                xhr.open('POST', apiURL + '/playlist/play/-1', true);
+                xhr.onload = function() {
+                    if (this.status < 200 && this.status >= 400) {
+                        console.log('Error playing');
+                        return;
+                    }
+                };
+                xhr.onerror = function(){
+                    console.log('Error playing');
+                    return;
+                };
+                xhr.send();
+            },
+            queue: function(loc) {
+                let xhr = new XMLHttpRequest();
+                loc = encodeURIComponent(loc);
+                xhr.open('POST', apiURL + '/playlist/load/' + loc, true);
+                xhr.onload = function() {
+                    if (this.status < 200 && this.status >= 400) {
+                        console.log('Error loading playlist');
+                        return;
+                    }
+                };
+                xhr.onerror = function(){
+                    console.log('Error loading playlist');
+                    return;
+                };
+                xhr.send();
             },
         },
     };
@@ -387,17 +577,18 @@ $(document).ready(function() {
         ],
     });
 
+    // TODO: Vanilla JS
     // Close the navbar on link clink
-    $(document).on('click', '.navbar-collapse.in',function(e) {
-        if( $(e.target).is('a:not(".dropdown-toggle")') ) {
-            $(this).collapse('hide');
-        }
-    });
+    // $(document).on('click', '.navbar-collapse.in',function(e) {
+    //     if( $(e.target).is('a:not(".dropdown-toggle")') ) {
+    //         $(this).collapse('hide');
+    //     }
+    // });
 
     // WebSocket connection
     openWebSocket();
     function openWebSocket() {
-        var ws = new WebSocket(wsURL);
+        let ws = new WebSocket(wsURL);
         ws.onopen = function(evt) { onOpen(evt); };
         ws.onmessage = function(evt) { onMessage(evt); };
         ws.onclose = function(){
@@ -409,9 +600,8 @@ $(document).ready(function() {
         // console.log('WebSocket connection open');
     }
     function onMessage(evt) {
-        var resp = JSON.parse(evt.data);
+        let resp = JSON.parse(evt.data);
 
-        // console.log(resp);
         // Update the Vuex datastore, with each message received.
         if ( resp.Status ) { store.commit('setStatus', resp.Status); }
 
@@ -420,23 +610,22 @@ $(document).ready(function() {
             document.title = resp.CurrentSong.Artist + ' - ' +
                 resp.CurrentSong.Title;
             // Need to set navbar manually -- it's not currently in the app.
-            $('#now-playing').html(
-                '<strong>' + resp.CurrentSong.Title + '</strong> by ' +
-                resp.CurrentSong.Artist
-            );
+            document.getElementById('now-playing').innerHTML =
+                '<strong>' + resp.CurrentSong.Title + '</strong> by ' + resp.CurrentSong.Artist;
         }
         else {
             store.commit('setCurrentSong', {})
-            $('#now-playing').html('&mdash;');
+            document.getElementById('now-playing').innerHTML = '&mdash;'
             document.title = 'Juke';
         }
 
         // Update the current loaded playlist
         if (resp.Playlist) {
-            store.commit( 'setPlaylist', resp.Playlist );
+            store.commit('setPlaylist', resp.Playlist);
         }
 
-        $(window).scrollTop(scrollPos);
+        // TODO: Vanilla JS
+        // $(window).scrollTop(scrollPos);
         scrollPos = 0;
     }
 
