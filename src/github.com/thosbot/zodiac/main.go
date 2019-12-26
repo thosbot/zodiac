@@ -101,7 +101,6 @@ type Status struct {
 }
 
 func getStatus() (*Status, error) {
-	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
 	if err != nil {
 		return nil, err
@@ -136,7 +135,6 @@ func getStatus() (*Status, error) {
 func nowPlaying(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd dial"))
@@ -239,7 +237,6 @@ func playerAction(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	action := vars["action"]
 
-	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd dial"))
@@ -284,7 +281,6 @@ func list(w http.ResponseWriter, r *http.Request) {
 	// TODO: Check vars type
 	vars := mux.Vars(r)
 
-	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd dial"))
@@ -324,7 +320,6 @@ type Album struct {
 func listAlbums(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd dial"))
@@ -385,7 +380,6 @@ func listAlbums(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Return results
 	b, err := json.Marshal(resp)
 	if err != nil {
 		log.Println(errors.Wrap(err, "json marshal"))
@@ -521,7 +515,6 @@ func findSongs(w http.ResponseWriter, r *http.Request) {
 func addLoc(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd dial"))
@@ -542,7 +535,6 @@ func addLoc(w http.ResponseWriter, r *http.Request) {
 func clearPlaylist(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd dial"))
@@ -570,7 +562,6 @@ func playPos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Connect to MPD server
 	mpdconn, err := mpd.Dial("tcp", "localhost:6600")
 	if err != nil {
 		log.Println(errors.Wrapf(err, "mpd dial"))
